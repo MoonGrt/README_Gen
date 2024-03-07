@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, subprocess, shutil
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QFormLayout, QPlainTextEdit, QFrame, QGridLayout
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QTreeWidget, QTreeWidgetItem, QFileDialog, QScrollArea, QSizePolicy, QMessageBox
 from PyQt5.QtGui import QIcon
@@ -208,25 +208,59 @@ class Markdown_display(QWidget):
         self.setLayout(layout)
 
     # 显示 markdown
-    def markdown_show(self, markdown, path):
+    def markdown_show(self, markdown, MIT_license, path, contents):
         self.markdown = markdown
         self.path = path
-        print(path)
+        self.contents = contents
+        self.MIT_license = MIT_license
         self.text_edit.setPlainText(self.markdown)
 
     # 保存 markdown 到文件
-    def save_markdown(self, path):
-        if path:
+    def save_markdown(self):
+        if self.path:
+            # 将 License 内容保存到文件中
+            readme_path = self.path+'/LICENSE'
+            with open(readme_path, 'w', encoding='utf-8') as readme_file:
+                readme_file.write(self.MIT_license)
+            print(f"LICENSE generated successfully at {readme_path}")
+
             # 将readme_content内容保存到文件中
-            readme_path = os.path.join(os.getcwd(), 'README.md')
+            readme_path = self.path+'/README.md'
             with open(readme_path, 'w', encoding='utf-8') as readme_file:
                 readme_file.write(self.markdown)
-
             print(f"README.md generated successfully at {readme_path}")
+
+            self.copy_images_folder()
         else:
             QMessageBox.information(self, "Message", "Please select a folder")
 
         self.close()
+
+    def copy_images_folder(self):        
+        # 获取当前目录下的 'images' 文件夹路径
+        source_folder = os.path.join(os.getcwd(), 'images')
+
+        # 检查 'images' 文件夹是否存在
+        if not os.path.exists(source_folder):
+            print("错误：当前目录下找不到 'images' 文件夹。")
+            return
+
+        # 检查目标文件夹是否存在，如果不存在则创建
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+            print(f"已创建目标文件夹：{self.path}")
+
+        # 构建目标文件夹中 'images' 文件夹的路径
+        destination_path = os.path.join(self.path, 'images')
+
+        try:
+            # 使用 shutil.copytree 复制 'images' 文件夹到目标文件夹
+            shutil.copytree(source_folder, destination_path)
+            print(f"成功将 'images' 文件夹复制到 {self.path}")
+        except shutil.Error as e:
+            print(f"复制 'images' 文件夹时发生错误：{e}")
+        except Exception as e:
+            print(f"发生意外错误：{e}")
 
 
 class App_window(QWidget):
@@ -322,9 +356,9 @@ class App_window(QWidget):
 
         # 设置信息默认值
         self.username_input.setText('MoonGrt')
-        self.repo_input.setText('python_tool')
+        # self.repo_input.setText('python_tool')
         self.mail_input.setText('1561145394@qq.com')
-        self.title_input.setText('Python Tool')
+        # self.title_input.setText('Python Tool')
         self.MIT_date_input.setText(str(datetime.now().year))
         self.MIT_name_input.setText('MoonGrt')
 
@@ -485,9 +519,54 @@ class App_window(QWidget):
 
     # 发送到github仓库
     def git_send(self):
-        print(gen_Contents(self.content_tree.get_items_state()))
-        # print(self.content_tree.get_items_state())
-        # print(self.file_tree.get_markdown_tree())
+        # 切换到用户指定的文件夹
+        dir = self.folder_path_input.text() 
+        if os.path.exists(dir):
+            os.chdir(dir)
+        else:
+            QMessageBox.information(self, "Message", "Please select a folder")
+            return
+
+        # 检查当前目录是否包含.git文件夹，以确定是否已进行git初始化
+        if not os.path.exists('.git'):
+            # 如果未初始化，则执行git初始化
+            subprocess.run(['git', 'init'])
+            print("Git initialized.")
+
+        # 检查是否已有远程仓库
+        remote_output = subprocess.run(['git', 'remote', '-v'], capture_output=True, text=True)
+        if 'origin' not in remote_output.stdout:
+            # 如果没有远程仓库，则添加
+            # 获取远程仓库URL，替换为你自己的GitHub仓库URL
+            repository_url = f"https://github.com/{self.username_input.text()}/{self.repo_input.text()}.git"
+            subprocess.run(['git', 'remote', 'add', 'origin', repository_url])
+            print(f"Remote repository added: {repository_url}")
+
+        # 将所有更改添加到暂存区
+        subprocess.run(['git', 'add', '.'])
+        # 检查是否有未提交的更改
+        status_output = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True)
+        if not status_output.stdout:
+            print("No changes to commit.")
+            return
+        # 提交更改
+        subprocess.run(['git', 'commit', '-m', 'Commit changes'])
+
+        # 获取当前分支名称
+        branch_output = subprocess.run(['git', 'branch', '--show-current'], capture_output=True, text=True)
+        current_branch = branch_output.stdout.strip()
+
+        # 将更改推送到GitHub的当前分支  
+        remote_info = subprocess.run(['git', 'remote', 'show', 'origin'], capture_output=True, text=True)
+        if 'unknown' in remote_info.stdout:
+            # 如果没有上游分支，则使用 -u 参数设置上游分支
+            subprocess.run(['git', 'push', '-u', 'origin', current_branch])
+        else:
+            # 如果已有上游分支，则直接推送
+            subprocess.run(['git', 'push', '-f', 'origin', current_branch])
+
+        print(f"Changes pushed to {current_branch} on GitHub.")
+
 
     # 将FileTree类的handle_item_changed函数移到这里：file_tree选项的选择要影响窗口内容
     def file_tree_handle_item_changed(self, item, column):
@@ -644,23 +723,25 @@ class App_window(QWidget):
             self.readme_content += self.markdown_filetree_input.toPlainText()
         # 生成 README.md 的 About The Project 部分
         if self.contents.get('About The Project'):
+            self.readme_content += self.about_input.toPlainText()
             if self.contents.get('Built With'):
-                pass
+                self.readme_content += self.buildwith_input.toPlainText()
         # 生成 README.md 的 Getting Started 部分
         if self.contents.get('Getting Started'):
+            self.readme_content += self.start_input.toPlainText()
             if self.contents.get('Prerequisites'):
-                pass
+                self.readme_content += self.prerequisites_input.toPlainText()
             if self.contents.get('Installation'):
-                pass
+                self.readme_content += self.installation_input.toPlainText()
         # 生成 README.md 的 Usage 部分
         if self.contents.get('Usage'):
-            pass
+            self.readme_content += self.usage_input.toPlainText()
         # 生成 README.md 的 Roadmap 部分
         if self.contents.get('Roadmap'):
-            pass
+            self.readme_content += self.roadmap_input.toPlainText()
         # 生成 README.md 的 Version 部分
         if self.contents.get('Version'):
-            pass
+            self.readme_content += self.version_input.toPlainText()
         # 生成 README.md 的 Contributing 部分
         if self.contents.get('Contributing'):
             # self.readme_content += gen_Contributing()
@@ -682,8 +763,9 @@ class App_window(QWidget):
             self.readme_content += gen_Foot(username, repo_name)
 
         self.markdown_display = Markdown_display()
-        self.markdown_display.markdown_show(self.readme_content, self.folder_path_input.text())
+        self.markdown_display.markdown_show(self.readme_content, self.MIT_input.toPlainText(), self.folder_path_input.text(), self.contents)
         self.markdown_display.show()
+        # self.copy_images_folder()
 
 
 
@@ -700,7 +782,6 @@ def gen_Head(username, repo_name, title, description):
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
 
 
 <!-- PROJECT LOGO -->
@@ -774,7 +855,7 @@ def gen_Contents(contents):
 
     # 是否开启 Filetree
     if contents.get('File Tree'):
-        Contents += """    <li><a href="#File Tree">File Tree</a></li>\n"""
+        Contents += """    <li><a href="#file-tree">File Tree</a></li>\n"""
     # 是否开启 About The Project
     if contents.get('About The Project'):
         Contents += """    <li>\n      <a href="#about-the-project">About The Project</a>\n      <ul>\n"""
@@ -795,6 +876,9 @@ def gen_Contents(contents):
     # 是否开启 Roadmap
     if contents.get('Roadmap'):
         Contents += """    <li><a href="#roadmap">Roadmap</a></li>\n"""
+    # 是否开启 Version
+    if contents.get('Version'):
+        Contents += """    <li><a href="#version">Version</a></li>\n"""
     # 是否开启 Contributing
     if contents.get('Contributing'):
         Contents += """    <li><a href="#contributing">Contributing</a></li>\n"""
@@ -807,7 +891,7 @@ def gen_Contents(contents):
     # 是否开启 Acknowledgments
     if contents.get('Acknowledgments'):
         Contents += """    <li><a href="#acknowledgments">Acknowledgments</a></li>\n"""
-    Contents += """  </ol>\n</details>"""
+    Contents += """  </ol>\n</details>\n\n"""
 
     return Contents
 
@@ -832,7 +916,6 @@ def gen_About_The_Project():
 
 Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
 
-<p align="right">(<a href="#top">back to top</a>)</p>
 """
 
 # 生成 README.md 的 Build 部分
@@ -848,7 +931,7 @@ def gen_Build():
 * [Bootstrap](https://getbootstrap.com)
 * [JQuery](https://jquery.com)
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">top</a>)</p>
 
 """
 
@@ -870,7 +953,7 @@ This is an example of how to list things you need to use the software and how to
   ```sh
   npm install npm@latest -g
   ```
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">top</a>)</p>
 """
 
 # 生成 README.md 的 Installation 部分
@@ -893,7 +976,7 @@ _Below is an example of how you can instruct your audience on installing and set
    const API_KEY = 'ENTER YOUR API';
    ```
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">top</a>)</p>
 
 """
 
@@ -906,7 +989,7 @@ Use this space to show useful examples of how a project can be used. Additional 
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">top</a>)</p>
 
 """
 
@@ -916,7 +999,7 @@ def gen_Roadmap():
 ## Roadmap
 
 - [x] Add Changelog
-- [x] Add back to top links
+- [x] Add top links
 - [ ] Add Additional Templates w/ Examples
 - [ ] Add "components" document to easily copy & paste sections of the readme
 - [ ] Multi-language Support
@@ -925,13 +1008,28 @@ def gen_Roadmap():
 
 See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">(<a href="#top">top</a>)</p>
 
 """
 
 # 生成 README.md 的 Verison 部分
 def gen_Verison():
-    return f""""""
+    return f"""<!-- Version -->
+## Version
+
+- [x] Add Changelog
+- [x] Add top links
+- [ ] Add Additional Templates w/ Examples
+- [ ] Add "components" document to easily copy & paste sections of the readme
+- [ ] Multi-language Support
+    - [ ] Chinese
+    - [ ] Spanish
+
+See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
+
+<p align="right">(<a href="#top">top</a>)</p>
+
+"""
 
 # 生成 README.md 的 Contributing 部分
 def gen_Contributing():
@@ -961,32 +1059,28 @@ Distributed under the MIT License. See `LICENSE` for more information.
 """
 
 # 生成 MIT licsense
-def gen_MIT(year=datetime.now().year, author_name='MoonGrt', email_address=''):
-    if email_address:
-        email_address = '(' + email_address + ')'
+def gen_MIT(year=datetime.now().year, author_name='MoonGrt'):
     return f"""MIT License
-Copyright (c) {year}, {author_name}{email_address}
 
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject
-to the following conditions:
+Copyright (c) {year} {author_name}
 
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-(MIT license, http://www.opensource.org/licenses/mit-license.html)
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 """
 
@@ -1033,8 +1127,6 @@ def gen_Foot(username, repo_name):
 [issues-url]: https://github.com/{username}/{repo_name}/issues
 [license-shield]: https://img.shields.io/github/license/{username}/{repo_name}.svg?style=for-the-badge
 [license-url]: https://github.com/{username}/{repo_name}/blob/master/LICENSE
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/linkedin_username
 
 """
 
