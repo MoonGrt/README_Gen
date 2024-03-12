@@ -1,4 +1,4 @@
-import sys, os, subprocess, shutil, requests
+import sys, os, subprocess, shutil, requests, re
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QPlainTextEdit, QFrame, QGridLayout, QComboBox
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QTreeWidget, QTreeWidgetItem, QFileDialog, QScrollArea, QSizePolicy, QMessageBox
 from PyQt5.QtGui import QIcon
@@ -98,21 +98,27 @@ class FileTree(QTreeWidget):
 
         # 处理文件类型的子项
         if file_cnt:
+            index = 0
             for i in range(item.childCount()):
                 child_item = item.child(i)
                 item_name = child_item.text(0)
+                is_last = index == file_cnt - 1
 
                 if child_item.checkState(0) == 2 and child_item.childCount() == 0:
-                    content += indent + ('└─ ' if not folder_cnt else '├─ ') + item_name + '\n'
+                    index += 1
+                    content += indent + ('└─ ' if not folder_cnt and is_last else '├─ ') + item_name + '\n'
 
         # 处理文件夹类型的子项
         if folder_cnt:
+            index = 0
             for i in range(item.childCount()):
                 child_item = item.child(i)
                 item_name = child_item.text(0)
-                is_last = i == folder_cnt - 1
+                is_last = index == folder_cnt - 1
+                # last = i == folder_cnt
 
                 if child_item.checkState(0) == 2 and child_item.childCount() > 0:
+                    index += 1
                     content += indent + ('└─ ' if is_last else '├─ ') + '/' + item_name + '/\n'
                     content += self.get_markdown_tree_recurse(child_item, indent, is_last)
 
@@ -359,7 +365,6 @@ class App_window(QWidget):
         self.username_input.setText('MoonGrt')
         # self.repo_input.setText('python_tool')
         self.mail_input.setText('1561145394@qq.com')
-        # self.title_input.setText('Python Tool')
         self.MIT_date_input.setText(str(datetime.now().year))
         self.MIT_name_input.setText('MoonGrt')
 
@@ -392,10 +397,10 @@ class App_window(QWidget):
         if repositories:
             for repo in repositories:
                 self.repo_input.addItem(repo["name"])
+        self.title_input.setText(self.repo_input.currentText())
 
         # 信息链接
         self.username_input.textChanged.connect(self.handle_username_change)
-        # self.repo_input.textChanged.connect(self.handle_repo_change)
         self.repo_input.currentIndexChanged.connect(self.handle_repo_change)
         self.mail_input.textChanged.connect(self.handle_mail_change)
         self.MIT_name_input.textChanged.connect(self.handle_MIT_name_change)
@@ -536,9 +541,30 @@ class App_window(QWidget):
             self.file_tree.clear()
             self.file_tree.add_items(self.file_tree.root, folder_path)
             self.markdown_filetree_input.setPlainText(gen_Filetree(self.file_tree.get_markdown_tree()))
+            self.description_input.setPlainText(self.extract_description())
 
+    # 提取当前文件夹中 README 的 description
+    def extract_description(self):
+        file_path = self.folder_path_input.text() + '/README.md'
+        with open(file_path, 'r', encoding='utf-8') as file:
+            file_content = file.read()
+
+            # 定义正则表达式，匹配 <p align="center"> 到下一个 <br /> 之间的内容
+            regex_pattern = r"<p align=\"center\">\s*(.*?)\s*<br />"
+            # 使用正则表达式进行匹配
+            match = re.search(regex_pattern, file_content, re.DOTALL)
+            # 提取匹配到的内容
+            if match:
+                description = match.group(1).strip()
+                return description
+            else:
+                return ""
+        
     # 发送到github仓库
     def git_send(self):
+        # print(self.file_tree.get_markdown_tree())
+        # return
+
         # 切换到用户指定的文件夹
         dir = self.folder_path_input.text() 
         if os.path.exists(dir):
@@ -601,7 +627,8 @@ class App_window(QWidget):
                 for i in range(item.childCount()):
                     child_item = item.child(i)
                     child_item.setDisabled(False)
-                    child_item.setCheckState(0, 2)
+                    if child_item.text(0) != '.git':
+                        child_item.setCheckState(0, 2)
 
         # 根据用户的选择改变markdown_filetree_input
         self.markdown_filetree_input.setPlainText(gen_Filetree(self.file_tree.get_markdown_tree()))
@@ -1162,3 +1189,5 @@ if __name__ == '__main__':
     window = App_window()
     window.show()
     sys.exit(app.exec_())
+
+# TODO: 如果文件夹下有 README 则将相应内容填充到窗口
