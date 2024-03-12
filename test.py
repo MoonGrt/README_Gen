@@ -260,7 +260,7 @@ class Markdown_display(QWidget):
         except shutil.Error as e:
             print(f"复制 'images' 文件夹时发生错误：{e}")
         except Exception as e:
-            print(f"发生意外错误：{e}")
+            print(f"{e}")
 
 
 class App_window(QWidget):

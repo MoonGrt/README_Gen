@@ -1,5 +1,5 @@
-import sys, os, subprocess, shutil
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QFormLayout, QPlainTextEdit, QFrame, QGridLayout
+import sys, os, subprocess, shutil, requests
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QPlainTextEdit, QFrame, QGridLayout, QComboBox
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QTreeWidget, QTreeWidgetItem, QFileDialog, QScrollArea, QSizePolicy, QMessageBox
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
@@ -260,7 +260,7 @@ class Markdown_display(QWidget):
         except shutil.Error as e:
             print(f"复制 'images' 文件夹时发生错误：{e}")
         except Exception as e:
-            print(f"发生意外错误：{e}")
+            print(f"{e}")
 
 
 class App_window(QWidget):
@@ -281,7 +281,8 @@ class App_window(QWidget):
         self.username_label = QLabel('GitHub Username:')
         self.username_input = QLineEdit()
         self.repo_label = QLabel('Repository Name:')
-        self.repo_input = QLineEdit()
+        # self.repo_input = QLineEdit()
+        self.repo_input = QComboBox(self)
         self.mail_label = QLabel('Mail address:')
         self.mail_input = QLineEdit()
         self.folder_path_label = QLabel('Folder Path:')
@@ -375,7 +376,7 @@ class App_window(QWidget):
         self.contributing_input.setPlainText(gen_Contributing())
         self.license_input.setPlainText(gen_License())
         self.MIT_input.setPlainText(gen_MIT())
-        self.contact_input.setPlainText(gen_Contact(self.username_input.text(), self.repo_input.text(), self.mail_input.text()))
+        self.contact_input.setPlainText(gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
         self.acknowledgements_input.setPlainText(gen_Acknowledgments())
 
         self.MIT_layout = QHBoxLayout()
@@ -385,9 +386,17 @@ class App_window(QWidget):
         self.MIT_layout.addWidget(self.MIT_name_label, 1)
         self.MIT_layout.addWidget(self.MIT_name_input, 2)
 
+        # repo_input 信息填充
+        # 获取用户仓库列表
+        repositories = self.get_repoinfo()
+        if repositories:
+            for repo in repositories:
+                self.repo_input.addItem(repo["name"])
+
         # 信息链接
         self.username_input.textChanged.connect(self.handle_username_change)
-        self.repo_input.textChanged.connect(self.handle_repo_change)
+        # self.repo_input.textChanged.connect(self.handle_repo_change)
+        self.repo_input.currentIndexChanged.connect(self.handle_repo_change)
         self.mail_input.textChanged.connect(self.handle_mail_change)
         self.MIT_name_input.textChanged.connect(self.handle_MIT_name_change)
         self.MIT_date_input.textChanged.connect(self.handle_MIT_name_change)
@@ -485,15 +494,15 @@ class App_window(QWidget):
 
     # 处理 username 变化
     def handle_username_change(self, new_text):
-        self.contact_input.setPlainText(gen_Contact(self.username_input.text(), self.repo_input.text(), self.mail_input.text()))
+        self.contact_input.setPlainText(gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
 
     # 处理 repo 变化
     def handle_repo_change(self, new_text):
-        self.contact_input.setPlainText(gen_Contact(self.username_input.text(), self.repo_input.text(), self.mail_input.text()))
+        self.title_input.setText(self.repo_input.currentText())
 
     # 处理 mail 变化
     def handle_mail_change(self, new_text):
-        self.contact_input.setPlainText(gen_Contact(self.username_input.text(), self.repo_input.text(), self.mail_input.text()))
+        self.contact_input.setPlainText(gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
 
     # 处理 MIT_date 变化
     def handle_MIT_date_change(self, new_text):
@@ -507,6 +516,17 @@ class App_window(QWidget):
     def set_gridcolwidth_ratios(self, ratios):
         for col, ratio in enumerate(ratios):
             self.grid_layout.setColumnStretch(col, ratio)
+
+    def get_repoinfo(self):
+        url = f"https://api.github.com/users/{self.username_input.text()}/repos"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            repositories = response.json()
+            return repositories
+        else:
+            print(f"Error: Unable to fetch repositories. Status code: {response.status_code}")
+            return None
 
     # 浏览文件夹
     def browse_folder(self):
@@ -538,7 +558,7 @@ class App_window(QWidget):
         if 'origin' not in remote_output.stdout:
             # 如果没有远程仓库，则添加
             # 获取远程仓库URL，替换为你自己的GitHub仓库URL
-            repository_url = f"https://github.com/{self.username_input.text()}/{self.repo_input.text()}.git"
+            repository_url = f"https://github.com/{self.username_input.text()}/{self.repo_input.currentText()}.git"
             subprocess.run(['git', 'remote', 'add', 'origin', repository_url])
             print(f"Remote repository added: {repository_url}")
 
@@ -706,7 +726,7 @@ class App_window(QWidget):
     def generate_readme(self):
         self.contents = self.content_tree.get_items_state()
         username = self.username_input.text()
-        repo_name = self.repo_input.text()
+        repo_name = self.repo_input.currentText()
         self.readme_content = ''
 
         # 生成 README.md 的 Head 部分
