@@ -546,20 +546,24 @@ class App_window(QWidget):
     # 提取当前文件夹中 README 的 description
     def extract_description(self):
         file_path = self.folder_path_input.text() + '/README.md'
-        with open(file_path, 'r', encoding='utf-8') as file:
-            file_content = file.read()
 
-            # 定义正则表达式，匹配 <p align="center"> 到下一个 <br /> 之间的内容
-            regex_pattern = r"<p align=\"center\">\s*(.*?)\s*<br />"
-            # 使用正则表达式进行匹配
-            match = re.search(regex_pattern, file_content, re.DOTALL)
-            # 提取匹配到的内容
-            if match:
-                description = match.group(1).strip()
-                return description
-            else:
-                return ""
-        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                file_content = file.read()
+
+                # 定义正则表达式，匹配 <p align="center"> 到下一个 <br /> 之间的内容
+                regex_pattern = r"<p align=\"center\">\s*(.*?)\s*<br />"
+                # 使用正则表达式进行匹配
+                match = re.search(regex_pattern, file_content, re.DOTALL)
+                # 提取匹配到的内容
+                if match:
+                    description = match.group(1).strip()
+                    return description
+                else:
+                    return ""
+        except:
+            pass
+
     # 发送到github仓库
     def git_send(self):
         # print(self.file_tree.get_markdown_tree())
@@ -1186,3 +1190,4 @@ if __name__ == '__main__':
     sys.exit(app.exec_())
 
 # TODO: 如果文件夹下有 README 则将相应内容填充到窗口
+# TODO: 自动识别仓库名
