@@ -1158,7 +1158,7 @@ def gen_Acknowledgments():
 * [Img Shields](https://shields.io)
 * [GitHub Pages](https://pages.github.com)
 * [Font Awesome](https://fontawesome.com)
-* [React Icons](https://react-icons.github.io/react-icons/search)
+* [React Icons](https://react-icons.github.io/react-icons/search)   
 <p align="right">(<a href="#top">top</a>)</p>
 
 """
