@@ -1191,3 +1191,5 @@ if __name__ == '__main__':
 
 # TODO: 如果文件夹下有 README 则将相应内容填充到窗口
 # TODO: 自动识别仓库名
+# TODO: 添加对git异常的处理：fatal: detected dubious ownership in repository at 'U:/xxx'
+#       添加 ”git config --global --add safe.directory U:/xxx“
