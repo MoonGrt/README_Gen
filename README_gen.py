@@ -1194,3 +1194,4 @@ if __name__ == '__main__':
 # TODO: 添加对git异常的处理：fatal: detected dubious ownership in repository at 'U:/xxx'
 #       添加 ”git config --global --add safe.directory U:/xxx“
 # TODO: 先新建文件（图片等），再生成文件树
+
