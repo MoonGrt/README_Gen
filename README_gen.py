@@ -433,7 +433,6 @@ class App_window(QWidget):
         self.file_tree.itemChanged.connect(self.file_tree_handle_item_changed)
 
 
-
         # 左侧布局
         left_layout = QVBoxLayout()
         left_layout.addWidget(self.content_tree)
