@@ -540,8 +540,12 @@ class App_window(QWidget):
             self.folder_path_input.setText(folder_path)
             self.file_tree.clear()
             self.file_tree.add_items(self.file_tree.root, folder_path)
-            self.markdown_filetree_input.setPlainText(gen_Filetree(self.file_tree.get_markdown_tree()))
+            if not self.extract_file_tree():
+                self.markdown_filetree_input.setPlainText(gen_Filetree(self.file_tree.get_markdown_tree()))
+            else:
+                self.markdown_filetree_input.setPlainText(self.extract_file_tree())
             self.description_input.setPlainText(self.extract_description())
+    # TODO: 根据README 的 file_tree 勾选相应内容
 
     # 提取当前文件夹中 README 的 description
     def extract_description(self):
@@ -558,6 +562,27 @@ class App_window(QWidget):
                 # 提取匹配到的内容
                 if match:
                     description = match.group(1).strip()
+                    return description
+                else:
+                    return ""
+        except:
+            pass
+
+    # 提取当前文件夹中 README 的 file_tree
+    def extract_file_tree(self):
+        file_path = self.folder_path_input.text() + '/README.md'
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                file_content = file.read()
+
+                # 定义正则表达式模式，用于匹配文件树结构
+                pattern = r"(?<=## File Tree\n\n```\n)[\s\S]*?(?=\n```)"
+                # 使用正则表达式进行匹配
+                match = re.search(pattern, file_content, re.DOTALL)
+                # 提取匹配到的内容
+                if match:
+                    description = match.group(0).strip()
                     return description
                 else:
                     return ""
@@ -1196,4 +1221,4 @@ if __name__ == '__main__':
 # TODO: 添加对git异常的处理：fatal: detected dubious ownership in repository at 'U:/xxx'
 #       添加 ”git config --global --add safe.directory U:/xxx“
 # TODO: 先新建文件（图片等），再生成文件树
-
+# TODO: 添加“图片展示功能”
