@@ -1222,3 +1222,4 @@ if __name__ == '__main__':
 #       添加 ”git config --global --add safe.directory U:/xxx“
 # TODO: 先新建文件（图片等），再生成文件树
 # TODO: 添加“图片展示功能”
+# TODO: 修改文件树的添加（选中上层文件夹，不选中文件夹内容）

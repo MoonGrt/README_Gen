@@ -41,10 +41,16 @@
   </ol>
 </details>
 
+
+<!-- FILE TREE -->
+## File Tree
+
+```
 └─ Project
   ├─ LICENSE
   ├─ README.md
-  ├─ README_gen.py
+  ├─ README_Gen.py
+  ├─ run.bat
   ├─ temple_blank_cn.md
   ├─ temple_blank_en.md
   ├─ temple_cn.md
@@ -52,6 +58,10 @@
   ├─ test.py
   ├─ /icons/
   └─ /images/
+
+```
+
+
 <!-- CONTRIBUTING -->
 ## Contributing
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
