@@ -1216,10 +1216,13 @@ if __name__ == '__main__':
 
 
 
-# TODO: 如果文件夹下有 README 则将相应内容填充到窗口
+# TODO: 如果文件夹下有 README 则将相应内容填充到窗口，文件树的填充有问题
 # TODO: 自动识别仓库名
 # TODO: 添加对git异常的处理：fatal: detected dubious ownership in repository at 'U:/xxx'
 #       添加 ”git config --global --add safe.directory U:/xxx“
 # TODO: 先新建文件（图片等），再生成文件树
 # TODO: 添加“图片展示功能”
 # TODO: 修改文件树的添加（选中上层文件夹，不选中文件夹内容）
+# TODO: 添加功能，生成requirements，生成run.bat
+
+
