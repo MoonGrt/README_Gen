@@ -1224,5 +1224,5 @@ if __name__ == '__main__':
 # TODO: 添加“图片展示功能”
 # TODO: 修改文件树的添加（选中上层文件夹，不选中文件夹内容）
 # TODO: 添加功能，生成requirements，生成run.bat
-
-
+# TODO: 中英文版本
+# TODO: 添加release版本控制
