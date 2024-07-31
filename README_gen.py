@@ -1207,7 +1207,6 @@ def gen_Foot(username, repo_name):
 """ 
 
 
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = App_window()
