@@ -50,12 +50,12 @@
   ├─ LICENSE
   ├─ README.md
   ├─ README_Gen.py
+  ├─ requirements.txt
   ├─ run.bat
   ├─ temple_blank_cn.md
   ├─ temple_blank_en.md
   ├─ temple_cn.md
   ├─ temple_en.md
-  ├─ test.py
   ├─ /icons/
   └─ /images/
 
