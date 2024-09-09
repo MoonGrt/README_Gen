@@ -146,18 +146,48 @@ class ContentTree(QTreeWidget):
         self.root = self.invisibleRootItem()
 
     # 将内容项添加内容树中
-    def add_items(self, parent_text, children=None, default_checked=False):
-        parent_item = QTreeWidgetItem(self.root, [parent_text])
-        parent_item.setCheckState(0, 2 if default_checked else 0)  # 设置复选框状态，默认选中或不选中
+    # def add_items(self, parent_text, children=None, default_checked=False):
+    #     parent_item = QTreeWidgetItem(self.root, [parent_text])
+    #     parent_item.setCheckState(0, 2 if default_checked else 0)  # 设置复选框状态，默认选中或不选中
+    #     if children:
+    #         for child_text in children:
+    #             child_item = QTreeWidgetItem(parent_item)
+    #             child_item.setCheckState(0, 0)
+    #             child_item.setText(0, child_text)
+    #             # parent_item.setExpanded(True)
+    #             # if not default_checked:
+    #             #     child_item.setDisabled(True)
+    #     # else:
+    # 将内容项添加到内容树中，支持多级嵌套，新增展开参数
+    def add_items(self, parent_text, children=None, default_checked=False, default_expanded=False, parent_item=None):
+        # 如果 parent_item 是 None，说明是顶层节点，添加到根节点
+        if parent_item is None:
+            parent_item = QTreeWidgetItem(self.root, [parent_text])
+        else:
+            parent_item = QTreeWidgetItem(parent_item, [parent_text])
+        # 设置复选框状态
+        parent_item.setCheckState(0, 2 if default_checked else 0)
+        # 控制该项是否展开
+        if default_expanded:
+            self.expandItem(parent_item)
+        # 递归添加子节点
         if children:
-            for child_text in children:
-                child_item = QTreeWidgetItem(parent_item)
-                child_item.setCheckState(0, 0)
-                child_item.setText(0, child_text)
-                # parent_item.setExpanded(True)
-                # if not default_checked: 
-                #     child_item.setDisabled(True)
-        # else:
+            for child in children:
+                # 如果子节点是字符串，直接添加
+                if isinstance(child, str):
+                    child_item = QTreeWidgetItem(parent_item, [child])
+                    child_item.setCheckState(0, 0)
+                # 如果子节点是元组或列表，则递归调用
+                elif isinstance(child, (tuple, list)) and len(child) >= 2:
+                    # child[0] 是子节点的文本，child[1] 是子节点的子项
+                    child_text = child[0]
+                    child_children = child[1] if len(child) > 1 else []
+                    # 如果元组或列表有更多参数，分别获取default_checked和expanded的值
+                    child_default_checked = child[2] if len(child) > 2 else False
+                    child_default_expanded = child[3] if len(child) > 3 else False
+                    # 递归调用，传递子节点的特有属性
+                    self.add_items(child_text, child_children, default_checked=child_default_checked, default_expanded=child_default_expanded, parent_item=parent_item)
+
 
     # 获取内容树项目内容
     def get_items_state(self):
@@ -189,6 +219,7 @@ class ContentTree(QTreeWidget):
     #                 child_item = item.child(i)
     #                 child_item.setDisabled(False)
     #                 child_item.setCheckState(0, 2)
+
 
 
 # 完整 markdown 显示窗口
@@ -242,7 +273,7 @@ class Markdown_display(QWidget):
 
         self.close()
 
-    def copy_images_folder(self):        
+    def copy_images_folder(self):
         # 获取当前目录下的 'images' 文件夹路径
         source_folder = os.path.join(os.getcwd(), 'images')
 
@@ -407,25 +438,39 @@ class App_window(QWidget):
         self.MIT_date_input.textChanged.connect(self.handle_MIT_name_change)
 
         # 生成、发送按钮
-        self.confirm_button = QPushButton('Confirm', self)
-        self.confirm_button.clicked.connect(self.generate_readme)
+        self.confirm_button = QPushButton('Gen', self)
+        self.confirm_button.clicked.connect(self.GEN)
         self.git_send_button = QPushButton('Git Send', self)
         self.git_send_button.clicked.connect(self.git_send)
 
         # 内容目录
         self.content_tree = ContentTree()
-        self.content_tree.add_items("Head", default_checked=True)
-        self.content_tree.add_items("Contents", default_checked=True)
-        self.content_tree.add_items("File Tree", default_checked=True)
-        self.content_tree.add_items("About The Project", ["Built With"])
-        self.content_tree.add_items("Getting Started", ["Prerequisites", "Installation"])
-        self.content_tree.add_items("Usage")
-        self.content_tree.add_items("Roadmap")
-        self.content_tree.add_items("Version")
-        self.content_tree.add_items("Contributing", default_checked=True)
-        self.content_tree.add_items("License", default_checked=True)
-        self.content_tree.add_items("Contact", default_checked=True)
-        self.content_tree.add_items("Acknowledgments", default_checked=True)
+        self.content_tree.add_items("README", [("Head", [], True),
+                                               ("Contents", [], True),
+                                               ("File Tree", [], True),
+                                               ("About The Project", ["Built With"]),
+                                               ("Getting Started", ["Prerequisites", "Installation"]),
+                                               ("Usage", []),
+                                               ("Roadmap", []),
+                                               ("Version", []),
+                                               ("Contributing", [], True),
+                                               ("License", [], True),
+                                               ("Contact", [], True),
+                                               ("Acknowledgments", [], True)], default_checked=True, default_expanded=True)
+        self.content_tree.add_items("requirements.txt", default_checked=True)
+        self.content_tree.add_items("run.bat", default_checked=True)
+        # self.content_tree.add_items("Head", default_checked=True)
+        # self.content_tree.add_items("Contents", default_checked=True)
+        # self.content_tree.add_items("File Tree", default_checked=True)
+        # self.content_tree.add_items("About The Project", ["Built With"])
+        # self.content_tree.add_items("Getting Started", ["Prerequisites", "Installation"])
+        # self.content_tree.add_items("Usage")
+        # self.content_tree.add_items("Roadmap")
+        # self.content_tree.add_items("Version")
+        # self.content_tree.add_items("Contributing", default_checked=True)
+        # self.content_tree.add_items("License", default_checked=True)
+        # self.content_tree.add_items("Contact", default_checked=True)
+        # self.content_tree.add_items("Acknowledgments", default_checked=True)
         self.content_tree.itemChanged.connect(self.content_tree_handle_item_changed)
 
         # 文件树
@@ -550,11 +595,9 @@ class App_window(QWidget):
     # 提取当前文件夹中 README 的 description
     def extract_description(self):
         file_path = self.folder_path_input.text() + '/README.md'
-
         try:
             with open(file_path, 'r', encoding='utf-8') as file:
                 file_content = file.read()
-
                 # 定义正则表达式，匹配 <p align="center"> 到下一个 <br /> 之间的内容
                 regex_pattern = r"<p align=\"center\">\s*(.*?)\s*<br />"
                 # 使用正则表达式进行匹配
@@ -570,32 +613,32 @@ class App_window(QWidget):
 
     # 提取当前文件夹中 README 的 file_tree
     def extract_file_tree(self):
-        file_path = self.folder_path_input.text() + '/README.md'
-
+        # 获取 README.md 文件的路径
+        file_path = os.path.join(self.folder_path_input.text(), 'README.md')
         try:
+            # 打开 README.md 文件，读取其内容
             with open(file_path, 'r', encoding='utf-8') as file:
                 file_content = file.read()
-
-                # 定义正则表达式模式，用于匹配文件树结构
-                pattern = r"(?<=## File Tree\n\n```\n)[\s\S]*?(?=\n```)"
+                # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+                pattern = r"(<!-- FILE TREE -->\s*## File Tree\s*```\n[\s\S]*?\n```)"
                 # 使用正则表达式进行匹配
                 match = re.search(pattern, file_content, re.DOTALL)
-                # 提取匹配到的内容
+                # 如果匹配成功，提取并返回整个文件树块
                 if match:
-                    description = match.group(0).strip()
+                    description = match.group(1).strip()  # 获取整个匹配的内容
                     return description
                 else:
+                    # 如果未找到文件树部分，返回空字符串
                     return ""
-        except:
-            pass
+        except Exception as e:
+            # 如果读取文件时发生错误，打印错误信息
+            print(f"读取文件时出错: {e}")
+            return ""
 
     # 发送到github仓库
     def git_send(self):
-        # print(self.file_tree.get_markdown_tree())
-        # return
-
         # 切换到用户指定的文件夹
-        dir = self.folder_path_input.text() 
+        dir = self.folder_path_input.text()
         if os.path.exists(dir):
             os.chdir(dir)
         else:
@@ -631,7 +674,7 @@ class App_window(QWidget):
         branch_output = subprocess.run(['git', 'branch', '--show-current'], capture_output=True, text=True)
         current_branch = branch_output.stdout.strip()
 
-        # 将更改推送到GitHub的当前分支  
+        # 将更改推送到GitHub的当前分支
         remote_info = subprocess.run(['git', 'remote', 'show', 'origin'], capture_output=True, text=True)
         if 'unknown' in remote_info.stdout:
             # 如果没有上游分支，则使用 -u 参数设置上游分支
@@ -647,37 +690,36 @@ class App_window(QWidget):
     def file_tree_handle_item_changed(self, item, column):
         # 处理选项状态改变时的逻辑
         if item.childCount() > 0:  # 只处理文件夹
-            if item.checkState(0) == 0:  # 如果母选项未选中，则禁用子选项的选择功能
+            if item.checkState(0) == 0:
                 for i in range(item.childCount()):
                     child_item = item.child(i)
-                    child_item.setCheckState(0, 0)
+                    child_item.setCheckState(0, 0)  # 如果母选项未选中，则禁用子选项的选择功能
                     child_item.setDisabled(True)
-            elif item.checkState(0) == 2:  # 如果母选项选中，则开启子选项的选择功能
+            elif item.checkState(0) == 2:
                 for i in range(item.childCount()):
                     child_item = item.child(i)
                     child_item.setDisabled(False)
-                    if child_item.text(0) != '.git':
-                        child_item.setCheckState(0, 2)
-
-        # 根据用户的选择改变markdown_filetree_input
+                    # if child_item.text(0) != '.git':
+                    #     child_item.setCheckState(0, 2)  # 如果母选项选中，则开启子选项的选择功能
+        # 根据用户的选择改变 markdown_filetree_input
         self.markdown_filetree_input.setPlainText(gen_Filetree(self.file_tree.get_markdown_tree()))
 
     # 将ContentTree类的handle_item_changed函数移到这里：content_tree选项的选择要影响窗口部件
     def content_tree_handle_item_changed(self, item, column):
         # 处理选项状态改变时的逻辑
         if item.childCount() > 0:  # 只处理文件夹
-            if item.checkState(0) == 0:  # 如果母选项未选中，则禁用子选项的选择功能
+            if item.checkState(0) == 0:
                 for i in range(item.childCount()):
                     child_item = item.child(i)
-                    child_item.setCheckState(0, 0)
+                    # child_item.setCheckState(0, 0)  # 如果母选项未选中，则禁用子选项的选择功能
                     child_item.setDisabled(True)
-            elif item.checkState(0) == 2:  # 如果母选项选中，则开启子选项的选择功能
+            elif item.checkState(0) == 2:
                 for i in range(item.childCount()):
                     child_item = item.child(i)
+                    # child_item.setCheckState(0, 2)  # 如果母选项选中，则开启子选项的选择功能
                     child_item.setDisabled(False)
-                    child_item.setCheckState(0, 2)
-
-        self.update_form_layout(self.content_tree.get_items_state())
+        contents = self.content_tree.get_items_state()
+        self.update_form_layout(contents)
 
     # 根据用户选择的内容更新窗口
     def update_form_layout(self, contents):
@@ -690,97 +732,106 @@ class App_window(QWidget):
                 self.grid_layout.removeWidget(widget)
                 widget.setParent(None)
 
-        self.add_grid(self.username_label, self.username_input)
-        self.add_grid(self.repo_label, self.repo_input)
-        self.add_grid(self.mail_label, self.mail_input)
-        self.add_grid(self.folder_path_label, self.browse_button)
-        self.add_grid(self.folder_path_input)
-        self.add_grid()
-
-        # 是否开启 Head
-        if contents.get('Head'):
-            self.add_grid(self.title_label, self.title_input)
-            self.add_grid(self.description_label)
-            self.add_grid(self.description_input)
+        # 是否开启 README
+        if contents.get('README'):
+            # 添加基础内容
+            self.add_grid(self.username_label, self.username_input)
+            self.add_grid(self.repo_label, self.repo_input)
+            self.add_grid(self.mail_label, self.mail_input)
+            self.add_grid(self.folder_path_label, self.browse_button)
+            self.add_grid(self.folder_path_input)
             self.add_grid()
-        # 是否开启 Contents
-        if contents.get('Contents'):
-            pass
-        # 是否开启 Filetree
-        if contents.get('File Tree'):
-            self.add_grid(self.markdown_filetree_label)
-            self.add_grid(self.markdown_filetree_input)
-            self.file_tree.setEnabled(True)
-            self.add_grid()
-        else:
-            self.file_tree.setEnabled(False)
-        # 是否开启 About The Project
-        if contents.get('About The Project'):
-            self.add_grid(self.about_label)
-            self.add_grid(self.about_input)
-            self.add_grid()
-            if contents.get('Built With'):
-                self.add_grid(self.buildwith_label)
-                self.add_grid(self.buildwith_input)
+            # 是否开启 Head
+            if contents.get('Head'):
+                self.add_grid(self.title_label, self.title_input)
+                self.add_grid(self.description_label)
+                self.add_grid(self.description_input)
                 self.add_grid()
-        # 是否开启 Getting Started
-        if contents.get('Getting Started'):
-            self.add_grid(self.start_label)
-            self.add_grid(self.start_input)
-            self.add_grid()
-            if contents.get('Prerequisites'):
-                self.add_grid(self.prerequisites_label)
-                self.add_grid(self.prerequisites_input)
+            # 是否开启 Contents
+            if contents.get('Contents'):
+                pass
+            # 是否开启 Filetree
+            if contents.get('File Tree'):
+                self.add_grid(self.markdown_filetree_label)
+                self.add_grid(self.markdown_filetree_input)
+                self.file_tree.setEnabled(True)
                 self.add_grid()
-            if contents.get('Installation'):
-                self.add_grid(self.installation_label)
-                self.add_grid(self.installation_input)
+            else:
+                self.file_tree.setEnabled(False)
+            # 是否开启 About The Project
+            if contents.get('About The Project'):
+                self.add_grid(self.about_label)
+                self.add_grid(self.about_input)
                 self.add_grid()
-        # 是否开启 Usage
-        if contents.get('Usage'):
-            self.add_grid(self.usage_label)
-            self.add_grid(self.usage_input)
-            self.add_grid()
-        # 是否开启 Roadmap
-        if contents.get('Roadmap'):
-            self.add_grid(self.roadmap_label)
-            self.add_grid(self.roadmap_input)
-            self.add_grid()
-        # 是否开启 Version
-        if contents.get('Version'):
-            self.add_grid(self.version_label)
-            self.add_grid(self.version_input)
-            self.add_grid()
-        # 是否开启 Contributing
-        if contents.get('Contributing'):
-            self.add_grid(self.contributing_label)
-            self.add_grid(self.contributing_input)
-            self.add_grid()
-        # 是否开启 License
-        if contents.get('License'):
-            self.add_grid(self.license_label)
-            self.add_grid(self.license_input)
-            self.add_grid(self.MIT_label)
-            self.add_grid(self.MIT_layout)
-            self.add_grid(self.MIT_input)
-            self.add_grid()
-        # 是否开启 Contact
-        if contents.get('Contact'):
-            self.add_grid(self.contact_label)
-            self.add_grid(self.contact_input)
-            self.add_grid()
-        # 是否开启 Acknowledgments
-        if contents.get('Acknowledgments'):
-            self.add_grid(self.acknowledgements_label)
-            self.add_grid(self.acknowledgements_input)
-            self.add_grid()
+                if contents.get('Built With'):
+                    self.add_grid(self.buildwith_label)
+                    self.add_grid(self.buildwith_input)
+                    self.add_grid()
+            # 是否开启 Getting Started
+            if contents.get('Getting Started'):
+                self.add_grid(self.start_label)
+                self.add_grid(self.start_input)
+                self.add_grid()
+                if contents.get('Prerequisites'):
+                    self.add_grid(self.prerequisites_label)
+                    self.add_grid(self.prerequisites_input)
+                    self.add_grid()
+                if contents.get('Installation'):
+                    self.add_grid(self.installation_label)
+                    self.add_grid(self.installation_input)
+                    self.add_grid()
+            # 是否开启 Usage
+            if contents.get('Usage'):
+                self.add_grid(self.usage_label)
+                self.add_grid(self.usage_input)
+                self.add_grid()
+            # 是否开启 Roadmap
+            if contents.get('Roadmap'):
+                self.add_grid(self.roadmap_label)
+                self.add_grid(self.roadmap_input)
+                self.add_grid()
+            # 是否开启 Version
+            if contents.get('Version'):
+                self.add_grid(self.version_label)
+                self.add_grid(self.version_input)
+                self.add_grid()
+            # 是否开启 Contributing
+            if contents.get('Contributing'):
+                self.add_grid(self.contributing_label)
+                self.add_grid(self.contributing_input)
+                self.add_grid()
+            # 是否开启 License
+            if contents.get('License'):
+                self.add_grid(self.license_label)
+                self.add_grid(self.license_input)
+                self.add_grid(self.MIT_label)
+                self.add_grid(self.MIT_layout)
+                self.add_grid(self.MIT_input)
+                self.add_grid()
+            # 是否开启 Contact
+            if contents.get('Contact'):
+                self.add_grid(self.contact_label)
+                self.add_grid(self.contact_input)
+                self.add_grid()
+            # 是否开启 Acknowledgments
+            if contents.get('Acknowledgments'):
+                self.add_grid(self.acknowledgements_label)
+                self.add_grid(self.acknowledgements_input)
+                self.add_grid()
 
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.set_gridcolwidth_ratios([1, 2])
 
-    # 生成 README.md
-    def generate_readme(self):
+    def GEN(self):
         self.contents = self.content_tree.get_items_state()
+        # 生成 README.md
+        self.generate_readme()
+        # 生成 requirements.txt
+        # self.generate_requirements()
+        # 生成 run.bat
+        self.generate_run_bat()
+
+    def generate_readme(self):
         username = self.username_input.text()
         repo_name = self.repo_input.currentText()
         self.readme_content = ''
@@ -837,13 +888,18 @@ class App_window(QWidget):
         # 生成 README.md 的 Foot 部分
         if self.contents.get('Head'):
             self.readme_content += gen_Foot(username, repo_name)
-
         self.markdown_display = Markdown_display()
         self.markdown_display.markdown_show(self.readme_content, self.MIT_input.toPlainText(), self.folder_path_input.text(), self.contents)
         self.markdown_display.show()
-        # self.copy_images_folder()
 
+    def generate_requirements(self, path='.'):
+        subprocess.run(['pipreqs', path, '--force'], check=True)
 
+    def generate_run_bat(self):
+        batch_content = f"@echo off\npython {os.path.abspath(__file__)}"
+        print(batch_content)
+        with open('run.bat', 'w') as file:
+            file.write(batch_content)
 
 
 
@@ -1183,7 +1239,7 @@ def gen_Acknowledgments():
 * [Img Shields](https://shields.io)
 * [GitHub Pages](https://pages.github.com)
 * [Font Awesome](https://fontawesome.com)
-* [React Icons](https://react-icons.github.io/react-icons/search)   
+* [React Icons](https://react-icons.github.io/react-icons/search)
 <p align="right">(<a href="#top">top</a>)</p>
 
 """
@@ -1204,7 +1260,7 @@ def gen_Foot(username, repo_name):
 [license-shield]: https://img.shields.io/github/license/{username}/{repo_name}.svg?style=for-the-badge
 [license-url]: https://github.com/{username}/{repo_name}/blob/master/LICENSE
 
-""" 
+"""
 
 
 if __name__ == '__main__':
@@ -1219,7 +1275,7 @@ if __name__ == '__main__':
 # TODO: 自动识别仓库名
 # TODO: 添加对git异常的处理：fatal: detected dubious ownership in repository at 'U:/xxx'
 #       添加 ”git config --global --add safe.directory U:/xxx“
-# TODO: 先新建文件（图片等），再生成文件树
+# TODO: 新建文件（图片等）后更新文件树
 # TODO: 添加“图片展示功能”
 # TODO: 修改文件树的添加（选中上层文件夹，不选中文件夹内容）
 # TODO: 添加功能，生成requirements，生成run.bat
