@@ -445,7 +445,7 @@ class App_window(QWidget):
 
         # 内容目录
         self.content_tree = ContentTree()
-        self.content_tree.add_items("README", [("Head", [], True),
+        self.content_tree.add_items("README.md", [("Head", [], True),
                                                ("Contents", [], True),
                                                ("File Tree", [], True),
                                                ("About The Project", ["Built With"]),
@@ -457,7 +457,7 @@ class App_window(QWidget):
                                                ("License", [], True),
                                                ("Contact", [], True),
                                                ("Acknowledgments", [], True)], default_checked=True, default_expanded=True)
-        self.content_tree.add_items("requirements.txt", default_checked=True)
+        self.content_tree.add_items("requirements.txt")
         self.content_tree.add_items("run.bat", default_checked=True)
         # self.content_tree.add_items("Head", default_checked=True)
         # self.content_tree.add_items("Contents", default_checked=True)
@@ -733,7 +733,7 @@ class App_window(QWidget):
                 widget.setParent(None)
 
         # 是否开启 README
-        if contents.get('README'):
+        if contents.get('README.md'):
             # 添加基础内容
             self.add_grid(self.username_label, self.username_input)
             self.add_grid(self.repo_label, self.repo_input)
@@ -824,12 +824,15 @@ class App_window(QWidget):
 
     def GEN(self):
         self.contents = self.content_tree.get_items_state()
-        # 生成 README.md
-        self.generate_readme()
-        # 生成 requirements.txt
-        # self.generate_requirements()
-        # 生成 run.bat
-        self.generate_run_bat()
+        if self.contents.get('requirements.txt'):
+            # 生成 requirements.txt
+            self.generate_requirements()
+        if self.contents.get('run.bat'):
+            # 生成 run.bat
+            self.generate_run_bat()
+        if self.contents.get('README.md'):
+            # 生成 README.md
+            self.generate_readme()
 
     def generate_readme(self):
         username = self.username_input.text()
@@ -1277,7 +1280,5 @@ if __name__ == '__main__':
 #       添加 ”git config --global --add safe.directory U:/xxx“
 # TODO: 新建文件（图片等）后更新文件树
 # TODO: 添加“图片展示功能”
-# TODO: 修改文件树的添加（选中上层文件夹，不选中文件夹内容）
-# TODO: 添加功能，生成requirements，生成run.bat
 # TODO: 中英文版本
 # TODO: 添加release版本控制
