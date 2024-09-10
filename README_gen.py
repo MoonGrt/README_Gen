@@ -145,19 +145,6 @@ class ContentTree(QTreeWidget):
         self.setHeaderLabels(["Content"])
         self.root = self.invisibleRootItem()
 
-    # 将内容项添加内容树中
-    # def add_items(self, parent_text, children=None, default_checked=False):
-    #     parent_item = QTreeWidgetItem(self.root, [parent_text])
-    #     parent_item.setCheckState(0, 2 if default_checked else 0)  # 设置复选框状态，默认选中或不选中
-    #     if children:
-    #         for child_text in children:
-    #             child_item = QTreeWidgetItem(parent_item)
-    #             child_item.setCheckState(0, 0)
-    #             child_item.setText(0, child_text)
-    #             # parent_item.setExpanded(True)
-    #             # if not default_checked:
-    #             #     child_item.setDisabled(True)
-    #     # else:
     # 将内容项添加到内容树中，支持多级嵌套，新增展开参数
     def add_items(self, parent_text, children=None, default_checked=False, default_expanded=False, parent_item=None):
         # 如果 parent_item 是 None，说明是顶层节点，添加到根节点
@@ -187,7 +174,6 @@ class ContentTree(QTreeWidget):
                     child_default_expanded = child[3] if len(child) > 3 else False
                     # 递归调用，传递子节点的特有属性
                     self.add_items(child_text, child_children, default_checked=child_default_checked, default_expanded=child_default_expanded, parent_item=parent_item)
-
 
     # 获取内容树项目内容
     def get_items_state(self):
@@ -235,7 +221,7 @@ class Markdown_display(QWidget):
         self.setWindowIcon(QIcon('icons/markdown.svg'))
 
         self.text_edit = QPlainTextEdit()
-        self.confirm_button = QPushButton("Generate")
+        self.confirm_button = QPushButton("Confirm")
         self.confirm_button.clicked.connect(self.save_markdown)
 
         layout = QVBoxLayout()
@@ -270,7 +256,6 @@ class Markdown_display(QWidget):
             self.copy_images_folder()
         else:
             QMessageBox.information(self, "Message", "Please select a folder")
-
         self.close()
 
     def copy_images_folder(self):
@@ -1282,3 +1267,5 @@ if __name__ == '__main__':
 # TODO: 添加“图片展示功能”
 # TODO: 中英文版本
 # TODO: 添加release版本控制
+# TODO: 添加版本更新说明
+
