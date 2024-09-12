@@ -441,9 +441,9 @@ class App_window(QWidget):
                                                ("Contributing", [], True),
                                                ("License", [], True),
                                                ("Contact", [], True),
-                                               ("Acknowledgments", [], True)], default_checked=True, default_expanded=True)
+                                               ("Acknowledgments", [], True)], True, True)  # parent child checked expanded
         self.content_tree.add_items("requirements.txt")
-        self.content_tree.add_items("run.bat", default_checked=True)
+        self.content_tree.add_items("run.bat")
         # self.content_tree.add_items("Head", default_checked=True)
         # self.content_tree.add_items("Contents", default_checked=True)
         # self.content_tree.add_items("File Tree", default_checked=True)
@@ -884,6 +884,7 @@ class App_window(QWidget):
         subprocess.run(['pipreqs', path, '--force'], check=True)
 
     def generate_run_bat(self):
+        # TODO: problem
         batch_content = f"@echo off\npython {os.path.abspath(__file__)}"
         print(batch_content)
         with open('run.bat', 'w') as file:
