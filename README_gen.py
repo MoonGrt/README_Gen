@@ -1,302 +1,29 @@
-import sys, os, subprocess, shutil, requests, re
+import sys, os, subprocess, requests, re
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QPlainTextEdit, QFrame, QGridLayout, QComboBox
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QTreeWidget, QTreeWidgetItem, QFileDialog, QScrollArea, QSizePolicy, QMessageBox
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QFileDialog, QScrollArea, QSizePolicy, QMessageBox
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from datetime import datetime
-
-class FileTree(QTreeWidget):
-    def __init__(self):
-        super().__init__()
-        self.setColumnCount(1)
-        self.setHeaderLabels(["File Tree"])
-        self.root = self.invisibleRootItem()
-
-    # 添加文件、文件夹到文件树中
-    def add_items(self, parent_item, path, parent_is_root=True):
-        # 存储文件夹和文件
-        folders = []
-        files = []
-
-        for item_name in os.listdir(path):
-            item_path = os.path.join(path, item_name)
-            if os.path.isdir(item_path):
-                folders.append(item_name)
-            else:
-                files.append(item_name)
-
-        # 首先添加文件夹，然后添加文件
-        for item_name in folders + files:
-            item_path = os.path.join(path, item_name)
-            item = QTreeWidgetItem(parent_item, [item_name])
-
-            if parent_is_root:  # 如果是第一层，设置默认勾选
-                if item_name != '.git':
-                    item.setCheckState(0, 2)
-                else:
-                    item.setCheckState(0, 0)
-            else:
-                item.setCheckState(0, 0)
-
-            if os.path.isdir(item_path):
-                self.add_items(item, item_path, False)
-
-            # # 发射 itemChanged 信号，模拟用户手动更改选项的操作
-            # self.itemChanged.emit(item, 0)
-
-    # 获取用户选择的文件、文件夹生成的markdown文件树
-    def get_markdown_tree(self):
-        return "└─ Project\n" + self.get_markdown_tree_recurse(self.root)
-
-    # 递归生成markdown文件树
-    def get_markdown_tree_recurse(self, item, indent='', last=False):
-        content = ""
-        if item.childCount() == 0:
-            return content
-
-        # pattern 1
-        # indent += '  '
-        # for i in range(item.childCount()):
-        #     child_item = item.child(i)
-        #     item_name = child_item.text(0)
-
-        #     if child_item.checkState(0) == 2:
-        #         if child_item.childCount() > 0:
-        #             content += f"{indent}- /{item_name}/\n"
-        #         else:
-        #             content += f"{indent}- {item_name}\n"
-        #         content += self.get_markdown_tree_recurse(child_item, indent, True)
-
-
-        # # pattern 2
-        # indent += '   ' if last or item == self.root else '│  '
-        # for i in range(item.childCount()):
-        #     child_item = item.child(i)
-        #     item_name = child_item.text(0)
-        #     is_last = i==item.childCount()-1
-
-        #     if child_item.checkState(0) == 2:
-        #         if child_item.childCount() > 0:
-        #             content += indent + ('└─ ' if is_last else '├─ ') + '/' + item_name + '/\n'
-        #             content += self.get_markdown_tree_recurse(child_item, indent, is_last)
-        #         else:
-        #             content += indent + ('└─ ' if is_last else '├─ ') + item_name + '\n'
-
-
-        # pattern 3
-        indent += '  ' if last or item == self.root else '│ '
-
-        # 统计文件和文件夹数
-        file_cnt = 0
-        folder_cnt = 0
-        for i in range(item.childCount()):
-            child_item = item.child(i)
-            if child_item.checkState(0) == 2 and child_item.childCount() == 0:
-                file_cnt += 1
-            elif child_item.checkState(0) == 2 and child_item.childCount() > 0:
-                folder_cnt += 1
-
-        # 处理文件类型的子项
-        if file_cnt:
-            index = 0
-            for i in range(item.childCount()):
-                child_item = item.child(i)
-                item_name = child_item.text(0)
-                is_last = index == file_cnt - 1
-
-                if child_item.checkState(0) == 2 and child_item.childCount() == 0:
-                    index += 1
-                    content += indent + ('└─ ' if not folder_cnt and is_last else '├─ ') + item_name + '\n'
-
-        # 处理文件夹类型的子项
-        if folder_cnt:
-            index = 0
-            for i in range(item.childCount()):
-                child_item = item.child(i)
-                item_name = child_item.text(0)
-                is_last = index == folder_cnt - 1
-                # last = i == folder_cnt
-
-                if child_item.checkState(0) == 2 and child_item.childCount() > 0:
-                    index += 1
-                    content += indent + ('└─ ' if is_last else '├─ ') + '/' + item_name + '/\n'
-                    content += self.get_markdown_tree_recurse(child_item, indent, is_last)
-
-        return content
-
-    # def handle_item_changed(self, item, column):
-    #     # 处理选项状态改变时的逻辑
-    #     if item.childCount() > 0:  # 只处理文件夹
-    #         if item.checkState(0) == 0:  # 如果母选项未选中，则禁用子选项的选择功能
-    #             for i in range(item.childCount()):
-    #                 child_item = item.child(i)
-    #                 child_item.setCheckState(0, 0)
-    #                 child_item.setDisabled(True)
-    #         elif item.checkState(0) == 2:  # 如果母选项选中，则开启子选项的选择功能
-    #             for i in range(item.childCount()):
-    #                 child_item = item.child(i)
-    #                 child_item.setDisabled(False)
-    #                 child_item.setCheckState(0, 2)
-
-class ContentTree(QTreeWidget):
-    def __init__(self):
-        super().__init__()
-        self.setColumnCount(1)
-        self.setHeaderLabels(["Content"])
-        self.root = self.invisibleRootItem()
-
-    # 将内容项添加到内容树中，支持多级嵌套，新增展开参数
-    def add_items(self, parent_text, children=None, default_checked=False, default_expanded=False, parent_item=None):
-        # 如果 parent_item 是 None，说明是顶层节点，添加到根节点
-        if parent_item is None:
-            parent_item = QTreeWidgetItem(self.root, [parent_text])
-        else:
-            parent_item = QTreeWidgetItem(parent_item, [parent_text])
-        # 设置复选框状态
-        parent_item.setCheckState(0, 2 if default_checked else 0)
-        # 控制该项是否展开
-        if default_expanded:
-            self.expandItem(parent_item)
-        # 递归添加子节点
-        if children:
-            for child in children:
-                # 如果子节点是字符串，直接添加
-                if isinstance(child, str):
-                    child_item = QTreeWidgetItem(parent_item, [child])
-                    child_item.setCheckState(0, 0)
-                # 如果子节点是元组或列表，则递归调用
-                elif isinstance(child, (tuple, list)) and len(child) >= 2:
-                    # child[0] 是子节点的文本，child[1] 是子节点的子项
-                    child_text = child[0]
-                    child_children = child[1] if len(child) > 1 else []
-                    # 如果元组或列表有更多参数，分别获取default_checked和expanded的值
-                    child_default_checked = child[2] if len(child) > 2 else False
-                    child_default_expanded = child[3] if len(child) > 3 else False
-                    # 递归调用，传递子节点的特有属性
-                    self.add_items(child_text, child_children, default_checked=child_default_checked, default_expanded=child_default_expanded, parent_item=parent_item)
-
-    # 获取内容树项目内容
-    def get_items_state(self):
-        result = {}
-        for i in range(self.root.childCount()):
-            child_item = self.root.child(i)
-            self.get_items_recurse(child_item, result)
-        return result
-
-    def get_items_recurse(self, item, result):
-        item_text = item.text(0)
-        item_state = item.checkState(0)
-        result[item_text] = item_state
-
-        for i in range(item.childCount()):
-            child_item = item.child(i)
-            self.get_items_recurse(child_item, result)
-
-    # def handle_item_changed(self, item, column):
-    #     # 处理选项状态改变时的逻辑
-    #     if item.childCount() > 0:  # 只处理文件夹
-    #         if item.checkState(0) == 0:  # 如果母选项未选中，则禁用子选项的选择功能
-    #             for i in range(item.childCount()):
-    #                 child_item = item.child(i)
-    #                 child_item.setCheckState(0, 0)
-    #                 child_item.setDisabled(True)
-    #         elif item.checkState(0) == 2:  # 如果母选项选中，则开启子选项的选择功能
-    #             for i in range(item.childCount()):
-    #                 child_item = item.child(i)
-    #                 child_item.setDisabled(False)
-    #                 child_item.setCheckState(0, 2)
-
-
-
-# 完整 markdown 显示窗口
-class Markdown_display(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.markdown = ''
-        self.path = ''
-
-        # 设置主窗口属性
-        self.setGeometry(420, 220, 1100, 800)   # 设置窗口左上角位置为 (x, y)，宽度为 w，高度为 h
-        self.setWindowTitle('Markdown display')
-        self.setWindowIcon(QIcon('icons/markdown.svg'))
-
-        self.text_edit = QPlainTextEdit()
-        self.confirm_button = QPushButton("Confirm")
-        self.confirm_button.clicked.connect(self.save_markdown)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.text_edit)
-        layout.addWidget(self.confirm_button)
-
-        self.setLayout(layout)
-
-    # 显示 markdown
-    def markdown_show(self, markdown, MIT_license, path, contents):
-        self.markdown = markdown
-        self.path = path
-        self.contents = contents
-        self.MIT_license = MIT_license
-        self.text_edit.setPlainText(self.markdown)
-
-    # 保存 markdown 到文件
-    def save_markdown(self):
-        if self.path:
-            # 将 License 内容保存到文件中
-            readme_path = self.path+'/LICENSE'
-            with open(readme_path, 'w', encoding='utf-8') as readme_file:
-                readme_file.write(self.MIT_license)
-            print(f"LICENSE generated successfully at {readme_path}")
-
-            # 将readme_content内容保存到文件中
-            readme_path = self.path+'/README.md'
-            with open(readme_path, 'w', encoding='utf-8') as readme_file:
-                readme_file.write(self.markdown)
-            print(f"README.md generated successfully at {readme_path}")
-
-            self.copy_images_folder()
-        else:
-            QMessageBox.information(self, "Message", "Please select a folder")
-        self.close()
-
-    def copy_images_folder(self):
-        # 获取当前目录下的 'images' 文件夹路径
-        source_folder = os.path.join(os.getcwd(), 'images')
-
-        # 检查 'images' 文件夹是否存在
-        if not os.path.exists(source_folder):
-            print("错误：当前目录下找不到 'images' 文件夹。")
-            return
-
-        # 检查目标文件夹是否存在，如果不存在则创建
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-            print(f"已创建目标文件夹：{self.path}")
-
-        # 构建目标文件夹中 'images' 文件夹的路径
-        destination_path = os.path.join(self.path, 'images')
-
-        try:
-            # 使用 shutil.copytree 复制 'images' 文件夹到目标文件夹
-            shutil.copytree(source_folder, destination_path)
-            print(f"成功将 'images' 文件夹复制到 {self.path}")
-        except shutil.Error as e:
-            print(f"复制 'images' 文件夹时发生错误：{e}")
-        except Exception as e:
-            print(f"{e}")
-
+from Markdown import Markdown
+from FileTree import FileTree
+from ContentTree import ContentTree
+from README_temple import README_temple
 
 class App_window(QWidget):
     def __init__(self):
         super().__init__()
+        self.Markdown = Markdown()
+        self.README_temple = README_temple()
+
         self.readme_content = ''
         self.contents = {}
         self.init_ui()
 
     def init_ui(self):
         # 设置主窗口属性
-        self.setGeometry(400, 200, 1100, 800)   # 设置窗口左上角位置为 (x, y)，宽度为 w，高度为 h
+        self.resize(1100, 800)
         self.setWindowTitle('README.md Generator')
-        self.setWindowIcon(QIcon('icons/markdown.svg'))
+        self.setWindowIcon(QIcon('images/icons/markdown.svg'))
 
 
         # 基本信息
@@ -379,26 +106,25 @@ class App_window(QWidget):
 
         # 设置信息默认值
         self.username_input.setText('MoonGrt')
-        # self.repo_input.setText('python_tool')
         self.mail_input.setText('1561145394@qq.com')
         self.MIT_date_input.setText(str(datetime.now().year))
         self.MIT_name_input.setText('MoonGrt')
 
         # self.description_input.setPlainText()
         # self.markdown_filetree_input.setPlainText()
-        self.about_input.setPlainText(gen_About_The_Project())
-        self.buildwith_input.setPlainText(gen_Build())
-        self.start_input.setPlainText(gen_Getting_Started())
-        self.prerequisites_input.setPlainText(gen_Prerequisites())
-        self.installation_input.setPlainText(gen_Installation())
-        self.usage_input.setPlainText(gen_Usage())
-        self.roadmap_input.setPlainText(gen_Roadmap())
-        self.version_input.setPlainText(gen_Verison())
-        self.contributing_input.setPlainText(gen_Contributing())
-        self.license_input.setPlainText(gen_License())
-        self.MIT_input.setPlainText(gen_MIT())
-        self.contact_input.setPlainText(gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
-        self.acknowledgements_input.setPlainText(gen_Acknowledgments())
+        self.about_input.setPlainText(self.README_temple.gen_About_The_Project())
+        self.buildwith_input.setPlainText(self.README_temple.gen_Build())
+        self.start_input.setPlainText(self.README_temple.gen_Getting_Started())
+        self.prerequisites_input.setPlainText(self.README_temple.gen_Prerequisites())
+        self.installation_input.setPlainText(self.README_temple.gen_Installation())
+        self.usage_input.setPlainText(self.README_temple.gen_Usage())
+        self.roadmap_input.setPlainText(self.README_temple.gen_Roadmap())
+        self.version_input.setPlainText(self.README_temple.gen_Verison())
+        self.contributing_input.setPlainText(self.README_temple.gen_Contributing())
+        self.license_input.setPlainText(self.README_temple.gen_License())
+        self.MIT_input.setPlainText(self.README_temple.gen_MIT())
+        self.contact_input.setPlainText(self.README_temple.gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
+        self.acknowledgements_input.setPlainText(self.README_temple.gen_Acknowledgments())
 
         self.MIT_layout = QHBoxLayout()
         self.MIT_layout.addWidget(self.MIT_date_label, 1)
@@ -444,24 +170,11 @@ class App_window(QWidget):
                                                ("Acknowledgments", [], True)], True, True)  # parent child checked expanded
         self.content_tree.add_items("requirements.txt")
         self.content_tree.add_items("run.bat")
-        # self.content_tree.add_items("Head", default_checked=True)
-        # self.content_tree.add_items("Contents", default_checked=True)
-        # self.content_tree.add_items("File Tree", default_checked=True)
-        # self.content_tree.add_items("About The Project", ["Built With"])
-        # self.content_tree.add_items("Getting Started", ["Prerequisites", "Installation"])
-        # self.content_tree.add_items("Usage")
-        # self.content_tree.add_items("Roadmap")
-        # self.content_tree.add_items("Version")
-        # self.content_tree.add_items("Contributing", default_checked=True)
-        # self.content_tree.add_items("License", default_checked=True)
-        # self.content_tree.add_items("Contact", default_checked=True)
-        # self.content_tree.add_items("Acknowledgments", default_checked=True)
-        self.content_tree.itemChanged.connect(self.content_tree_handle_item_changed)
+        self.content_tree.itemChanged.connect(self.handle_contenttree_changed)
 
         # 文件树
         self.file_tree = FileTree()
-        self.file_tree.itemChanged.connect(self.file_tree_handle_item_changed)
-
+        self.file_tree.itemChanged.connect(self.handle_filetree_changed)
 
 
         # 左侧布局
@@ -496,15 +209,11 @@ class App_window(QWidget):
         layout.addLayout(right_layout, 3)
         self.setLayout(layout)
 
+
     # 添加组件到 grid_layout
     def add_grid(self, *widgets):
         # 如果没有传入任何组件，则添加空行或空行
         if not widgets:
-            # 创建空行
-            # empty_widget = QWidget()
-            # empty_widget.setFixedHeight(20)
-            # self.grid_layout.addWidget(empty_widget, self.grid_layout.rowCount(), 0, 1, -1)
-
             # 创建横线
             line = QFrame()
             line.setFrameShape(QFrame.HLine)
@@ -529,7 +238,7 @@ class App_window(QWidget):
 
     # 处理 username 变化
     def handle_username_change(self, new_text):
-        self.contact_input.setPlainText(gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
+        self.contact_input.setPlainText(self.README_temple.gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
 
     # 处理 repo 变化
     def handle_repo_change(self, new_text):
@@ -537,15 +246,15 @@ class App_window(QWidget):
 
     # 处理 mail 变化
     def handle_mail_change(self, new_text):
-        self.contact_input.setPlainText(gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
+        self.contact_input.setPlainText(self.README_temple.gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
 
     # 处理 MIT_date 变化
     def handle_MIT_date_change(self, new_text):
-        self.MIT_input.setPlainText(gen_MIT(self.MIT_date_input.text(), self.MIT_name_input.text()))
+        self.MIT_input.setPlainText(self.README_temple.gen_MIT(self.MIT_date_input.text(), self.MIT_name_input.text()))
 
     # 处理 MIT_name 变化
     def handle_MIT_name_change(self, new_text):
-        self.MIT_input.setPlainText(gen_MIT(self.MIT_date_input.text(), self.MIT_name_input.text()))
+        self.MIT_input.setPlainText(self.README_temple.gen_MIT(self.MIT_date_input.text(), self.MIT_name_input.text()))
 
     # 设置每列的宽度比例
     def set_gridcolwidth_ratios(self, ratios):
@@ -571,7 +280,7 @@ class App_window(QWidget):
             self.file_tree.clear()
             self.file_tree.add_items(self.file_tree.root, folder_path)
             if not self.extract_file_tree():
-                self.markdown_filetree_input.setPlainText(gen_Filetree(self.file_tree.get_markdown_tree()))
+                self.markdown_filetree_input.setPlainText(self.README_temple.gen_Filetree(self.file_tree.get_markdown_tree()))
             else:
                 self.markdown_filetree_input.setPlainText(self.extract_file_tree())
             self.description_input.setPlainText(self.extract_description())
@@ -670,9 +379,8 @@ class App_window(QWidget):
 
         print(f"Changes pushed to {current_branch} on GitHub.")
 
-
     # 将FileTree类的handle_item_changed函数移到这里：file_tree选项的选择要影响窗口内容
-    def file_tree_handle_item_changed(self, item, column):
+    def handle_filetree_changed(self, item, column):
         # 处理选项状态改变时的逻辑
         if item.childCount() > 0:  # 只处理文件夹
             if item.checkState(0) == 0:
@@ -687,10 +395,10 @@ class App_window(QWidget):
                     # if child_item.text(0) != '.git':
                     #     child_item.setCheckState(0, 2)  # 如果母选项选中，则开启子选项的选择功能
         # 根据用户的选择改变 markdown_filetree_input
-        self.markdown_filetree_input.setPlainText(gen_Filetree(self.file_tree.get_markdown_tree()))
+        self.markdown_filetree_input.setPlainText(self.README_temple.gen_Filetree(self.file_tree.get_markdown_tree()))
 
     # 将ContentTree类的handle_item_changed函数移到这里：content_tree选项的选择要影响窗口部件
-    def content_tree_handle_item_changed(self, item, column):
+    def handle_contenttree_changed(self, item, column):
         # 处理选项状态改变时的逻辑
         if item.childCount() > 0:  # 只处理文件夹
             if item.checkState(0) == 0:
@@ -828,10 +536,10 @@ class App_window(QWidget):
         if self.contents.get('Head'):
             title = self.title_input.text()
             description = self.description_input.toPlainText()
-            self.readme_content += gen_Head(username, repo_name, title, description)
+            self.readme_content += self.README_temple.gen_Head(username, repo_name, title, description)
         # 生成 README.md 的 Contents 部分
         if self.contents.get('Contents'):
-            self.readme_content += gen_Contents(self.contents)
+            self.readme_content += self.README_temple.gen_Contents(self.contents)
         # 生成 README.md 的 File tree 部分
         if self.contents.get('File Tree'):
             # self.readme_content += gen_Filetree(self.file_tree.get_markdown_tree())
@@ -875,16 +583,17 @@ class App_window(QWidget):
             self.readme_content += self.acknowledgements_input.toPlainText()
         # 生成 README.md 的 Foot 部分
         if self.contents.get('Head'):
-            self.readme_content += gen_Foot(username, repo_name)
-        self.markdown_display = Markdown_display()
-        self.markdown_display.markdown_show(self.readme_content, self.MIT_input.toPlainText(), self.folder_path_input.text(), self.contents)
-        self.markdown_display.show()
+            self.readme_content += self.README_temple.gen_Foot(username, repo_name)
+
+        
+        self.Markdown.markdown_show(self.readme_content, self.MIT_input.toPlainText(), self.folder_path_input.text(), self.contents)
+        self.Markdown.show()
 
     def generate_requirements(self, path='.'):
         subprocess.run(['pipreqs', path, '--force'], check=True)
 
     def generate_run_bat(self):
-        # TODO: problem
+        # TODO: 有问题
         batch_content = f"@echo off\npython {os.path.abspath(__file__)}"
         print(batch_content)
         with open('run.bat', 'w') as file:
@@ -894,362 +603,7 @@ class App_window(QWidget):
 
 
 
-# 生成 README.md 的 Head 部分
-def gen_Head(username, repo_name, title, description):
-    return f"""<div id="top"></div>
 
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-
-
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-	<a href="https://github.com/{username}/{repo_name}">
-	<img src="images/logo.png" alt="Logo" width="80" height="80">
-	</a>
-<h3 align="center">{title}</h3>
-	<p align="center">
-	{description}
-	<br />
-	<a href="https://github.com/{username}/{repo_name}"><strong>Explore the docs »</strong></a>
-	<br />
-	<br />
-	<a href="https://github.com/{username}/{repo_name}">View Demo</a>
-	·
-	<a href="https://github.com/{username}/{repo_name}/issues">Report Bug</a>
-	·
-	<a href="https://github.com/{username}/{repo_name}/issues">Request Feature</a>
-	</p>
-</div>
-
-"""
-
-# # pattern 1
-# # 生成 README.md 的 Contents 部分
-# def gen_Contents(contents):
-#     Contents = """\n<!-- CONTENTS -->\n## Contents\n"""
-
-#     # 是否开启Filetree
-#     if contents.get('File Tree'):
-#         Contents += """- [File Tree](#file-tree)\n"""
-#     # 是否开启About The Project
-#     if contents.get('About The Project'):
-#         Contents += """- [About The Project](#about-the-project)\n"""
-#         if contents.get('Built With'):
-#             Contents += """  - [Built With](#built-with)\n"""
-#     # 是否开启Getting Started
-#     if contents.get('Getting Started'):
-#         Contents += """- [Getting Started](#getting-started)\n"""
-#         if contents.get('Prerequisites'):
-#             Contents += """  - [Prerequisites](#prerequisites)\n"""
-#         if contents.get('Installation'):
-#             Contents += """  - [Installation](#installation)\n"""
-#     # 是否开启Usage
-#     if contents.get('Usage'):
-#         Contents += """- [Usage](#usage)\n"""
-#     # 是否开启Roadmap
-#     if contents.get('Roadmap'):
-#         Contents += """- [Roadmap](#roadmap)\n"""
-#     # 是否开启Contributing
-#     if contents.get('Contributing'):
-#         Contents += """- [Contributing](#contributing)\n"""
-#     # 是否开启License
-#     if contents.get('License'):
-#         Contents += """- [License](#license)\n"""
-#     # 是否开启Contact
-#     if contents.get('Contact'):
-#         Contents += """- [Contact](#contact)\n"""
-#     # 是否开启Acknowledgments
-#     if contents.get('Acknowledgments'):
-#         Contents += """- [Acknowledgments](#acknowledgments)\n\n"""
-
-#     return Contents
-
-# pattern 2
-# 生成 README.md 的 Contents 部分
-def gen_Contents(contents):
-    Contents = """\n<!-- CONTENTS -->\n<details open>\n  <summary>Contents</summary>\n  <ol>\n"""
-
-    # 是否开启 Filetree
-    if contents.get('File Tree'):
-        Contents += """    <li><a href="#file-tree">File Tree</a></li>\n"""
-    # 是否开启 About The Project
-    if contents.get('About The Project'):
-        Contents += """    <li>\n      <a href="#about-the-project">About The Project</a>\n      <ul>\n"""
-        if contents.get('Built With'):
-            Contents += """        <li><a href="#built-with">Built With</a></li>\n"""
-        Contents += """      </ul>\n    </li>\n"""
-    # 是否开启 Getting Started
-    if contents.get('Getting Started'):
-        Contents += """    <li>\n      <a href="#getting-started">Getting Started</a>\n      <ul>\n"""
-        if contents.get('Prerequisites'):
-            Contents += """        <li><a href="#prerequisites">Prerequisites</a></li>\n"""
-        if contents.get('Installation'):
-            Contents += """        <li><a href="#installation">Installation</a></li>\n"""
-        Contents += """      </ul>\n    </li>\n"""
-    # 是否开启 Usage
-    if contents.get('Usage'):
-        Contents += """    <li><a href="#usage">Usage</a></li>\n"""
-    # 是否开启 Roadmap
-    if contents.get('Roadmap'):
-        Contents += """    <li><a href="#roadmap">Roadmap</a></li>\n"""
-    # 是否开启 Version
-    if contents.get('Version'):
-        Contents += """    <li><a href="#version">Version</a></li>\n"""
-    # 是否开启 Contributing
-    if contents.get('Contributing'):
-        Contents += """    <li><a href="#contributing">Contributing</a></li>\n"""
-    # 是否开启 License
-    if contents.get('License'):
-        Contents += """    <li><a href="#license">License</a></li>\n"""
-    # 是否开启 Contact
-    if contents.get('Contact'):
-        Contents += """    <li><a href="#contact">Contact</a></li>\n"""
-    # 是否开启 Acknowledgments
-    if contents.get('Acknowledgments'):
-        Contents += """    <li><a href="#acknowledgments">Acknowledgments</a></li>\n"""
-    Contents += """  </ol>\n</details>\n\n"""
-
-    return Contents
-
-# 生成 README.md 的 Filetree 部分
-def gen_Filetree(Filetree):
-    return f"""
-<!-- FILE TREE -->
-## File Tree
-
-```
-{Filetree}
-```
-
-"""
-
-# 生成 README.md 的 About The Project 部分
-def gen_About_The_Project():
-    return f"""<!-- ABOUT THE PROJECT -->
-## About The Project
-
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
-
-"""
-
-# 生成 README.md 的 Build 部分
-def gen_Build():
-    return f"""### Built With
-
-* [Next.js](https://nextjs.org/)
-* [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
-
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
-
-# 生成 README.md 的 Getting Started 部分
-def gen_Getting_Started():
-    return f"""<!-- GETTING STARTED -->
-## Getting Started
-
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-"""
-
-# 生成 README.md 的 Prerequisites 部分
-def gen_Prerequisites():
-    return f"""### Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
-<p align="right">(<a href="#top">top</a>)</p>
-"""
-
-# 生成 README.md 的 Installation 部分
-def gen_Installation():
-    return f"""### Installation
-
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
-
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/your_username_/Project-Name.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
-
-# 生成 README.md 的 Usage 部分
-def gen_Usage():
-    return f"""<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
-
-# 生成 README.md 的 Roadmap 部分
-def gen_Roadmap():
-    return f"""<!-- ROADMAP -->
-## Roadmap
-
-- [x] Add Changelog
-- [x] Add top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
-
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
-
-# 生成 README.md 的 Verison 部分
-def gen_Verison():
-    return f"""<!-- Version -->
-## Version
-
-- [x] Add Changelog
-- [x] Add top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
-
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
-
-# 生成 README.md 的 Contributing 部分
-def gen_Contributing():
-    return f"""
-<!-- CONTRIBUTING -->
-## Contributing
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
-
-# 生成 README.md 的 License 部分
-def gen_License():
-    return f"""
-<!-- LICENSE -->
-## License
-Distributed under the MIT License. See `LICENSE` for more information.
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
-
-# 生成 MIT licsense
-def gen_MIT(year=datetime.now().year, author_name='MoonGrt'):
-    return f"""MIT License
-
-Copyright (c) {year} {author_name}
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-"""
-
-# 生成 README.md 的 Contact 部分
-def gen_Contact(username, repo_name, mail_address):
-    return f"""
-<!-- CONTACT -->
-## Contact
-{username} - {mail_address}
-Project Link: [{username}/{repo_name}](https://github.com/{username}/{repo_name})
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
-
-# 生成 README.md 的 Acknowledgments 部分
-def gen_Acknowledgments():
-    return f"""
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-* [Choose an Open Source License](https://choosealicense.com)
-* [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
-* [Malven's Flexbox Cheatsheet](https://flexbox.malven.co/)
-* [Malven's Grid Cheatsheet](https://grid.malven.co/)
-* [Img Shields](https://shields.io)
-* [GitHub Pages](https://pages.github.com)
-* [Font Awesome](https://fontawesome.com)
-* [React Icons](https://react-icons.github.io/react-icons/search)
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
-
-# 生成 README.md 的 Foot 部分
-def gen_Foot(username, repo_name):
-    return f"""
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/{username}/{repo_name}.svg?style=for-the-badge
-[contributors-url]: https://github.com/{username}/{repo_name}/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/{username}/{repo_name}.svg?style=for-the-badge
-[forks-url]: https://github.com/{username}/{repo_name}/network/members
-[stars-shield]: https://img.shields.io/github/stars/{username}/{repo_name}.svg?style=for-the-badge
-[stars-url]: https://github.com/{username}/{repo_name}/stargazers
-[issues-shield]: https://img.shields.io/github/issues/{username}/{repo_name}.svg?style=for-the-badge
-[issues-url]: https://github.com/{username}/{repo_name}/issues
-[license-shield]: https://img.shields.io/github/license/{username}/{repo_name}.svg?style=for-the-badge
-[license-url]: https://github.com/{username}/{repo_name}/blob/master/LICENSE
-
-"""
 
 
 if __name__ == '__main__':
