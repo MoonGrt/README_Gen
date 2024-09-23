@@ -46,6 +46,7 @@ class ContentTree(QTreeWidget):
             self.get_items_recurse(child_item, result)
         return result
 
+    # 递归获取内容树项目内容
     def get_items_recurse(self, item, result):
         item_text = item.text(0)
         item_state = item.checkState(0)
@@ -55,8 +56,8 @@ class ContentTree(QTreeWidget):
             child_item = item.child(i)
             self.get_items_recurse(child_item, result)
 
+    # 处理选项状态改变时的逻辑
     def handle_contenttree_changed(self, item, column):
-        # 处理选项状态改变时的逻辑
         if item.childCount() > 0:  # 只处理文件夹
             if item.checkState(0) == 0:
                 for i in range(item.childCount()):
@@ -68,6 +69,45 @@ class ContentTree(QTreeWidget):
                     child_item = item.child(i)
                     # child_item.setCheckState(0, 2)
                     child_item.setDisabled(False)  # 如果母选项选中，则开启子选项的选择功能
+
+    # 新增函数：返回树状结构和选中状态
+    def get_tree_structure(self, item=None):
+        if item is None:
+            item = self.root.child(0)  # REAMDE.md 分支
+        tree_structure = []
+        for i in range(item.childCount()):
+            child = item.child(i)
+            child_data = child.text(0)
+            # 获取节点的选中状态：2 表示选中，1 表示部分选中，0 表示未选中
+            is_checked = child.checkState(0) == 2
+            child_tree = self.get_tree_structure(child)
+            # 如果子节点有子项，递归添加到列表，并包含选中状态
+            if child_tree:
+                tree_structure.append({
+                    child_data: is_checked,
+                    'children': child_tree
+                })
+            else:
+                tree_structure.append({
+                    child_data: is_checked,
+                    'children': None
+                })
+        return tree_structure
+
+
+# Function to generate markdown from the section structure
+def generate_readme(sections, level=1):
+    markdown = ""
+    for section in sections:
+        for key, value in section.items():
+            if value is True or (value is False and 'children' in section and section['children']):
+                # Add the section title with corresponding heading level
+                markdown += f"{'#' * level} {key}\n\n"
+                if 'children' in section and section['children']:
+                    # Recursively add the child sections
+                    markdown += generate_readme(section['children'], level + 1)
+    return markdown
+
 
 
 if __name__ == '__main__':
@@ -101,5 +141,11 @@ if __name__ == '__main__':
     window.setWindowTitle('Content Tree Viewer')
     window.resize(400, 300)
     window.show()  # 显示窗口
+
+    content = content_tree.get_tree_structure()
+    print(content)
+    print(generate_readme(content))
+    # print(content_tree.root.child(0).text(0))
+    # print(content_tree.root.child(0).checkState(0))
 
     sys.exit(app.exec_())  # 运行应用程序

@@ -10,8 +10,8 @@ class Markdown(QWidget):
         self.path = ''
 
         # 设置主窗口属性
-        self.setGeometry(420, 220, 1100, 800)   # 设置窗口左上角位置为 (x, y)，宽度为 w，高度为 h
-        self.setWindowTitle('Markdown display')
+        self.resize(1100, 800)
+        self.setWindowTitle('Markdown Display')
         self.setWindowIcon(QIcon('images/icons/markdown.svg'))
 
         self.text_edit = QTextEdit()
@@ -22,10 +22,8 @@ class Markdown(QWidget):
         layout.addWidget(self.text_edit)
         layout.addWidget(self.confirm_button)
 
+        # self.markdown_showfile('README.md')  # test
         self.setLayout(layout)
-        
-        self.markdown_showfile('README.md')
-
 
 
     # 显示 markdown
@@ -35,6 +33,7 @@ class Markdown(QWidget):
         self.contents = contents
         self.MIT_license = MIT_license
         self.text_edit.setPlainText(self.markdown)
+        self.show()
 
     def markdown_showfile(self, file):
         # 读取文件内容

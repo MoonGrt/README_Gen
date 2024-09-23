@@ -1,6 +1,6 @@
 import sys, os, subprocess, requests, re
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QPlainTextEdit, QFrame, QGridLayout, QComboBox
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QFileDialog, QScrollArea, QSizePolicy, QMessageBox
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QFileDialog, QScrollArea, QSizePolicy, QTextEdit
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from datetime import datetime
@@ -8,12 +8,15 @@ from Markdown import Markdown
 from FileTree import FileTree
 from ContentTree import ContentTree
 from README_temple import README_temple
+from PicText import PicText
+import html2text
 
 class App_window(QWidget):
     def __init__(self):
         super().__init__()
         self.Markdown = Markdown()
         self.README_temple = README_temple()
+        self.aboutgen_window = PicText()
 
         self.readme_content = ''
         self.contents = {}
@@ -43,15 +46,17 @@ class App_window(QWidget):
         self.title_input = QLineEdit()
         self.description_label = QLabel('Project Description:')
         self.description_input = QPlainTextEdit()
-        self.description_input.setFixedHeight(200)
+        self.description_input.setFixedHeight(80)  # 200
         # File tree 信息
         self.markdown_filetree_label = QLabel('Fire Tree:')
         self.markdown_filetree_input = QPlainTextEdit()
         self.markdown_filetree_input.setFixedHeight(200)
         # About The Project 信息
         self.about_label = QLabel('About The Project:')
-        self.about_input = QPlainTextEdit()
-        self.about_input.setFixedHeight(200)
+        self.about_input = QTextEdit()
+        self.about_input.setFixedHeight(400)
+        self.aboutgen_button = QPushButton('About Gen', self)
+        self.aboutgen_button.clicked.connect(self.about_gen)
         # Build with 信息
         self.buildwith_label = QLabel('Build with:')
         self.buildwith_input = QPlainTextEdit()
@@ -110,22 +115,6 @@ class App_window(QWidget):
         self.MIT_date_input.setText(str(datetime.now().year))
         self.MIT_name_input.setText('MoonGrt')
 
-        # self.description_input.setPlainText()
-        # self.markdown_filetree_input.setPlainText()
-        self.about_input.setPlainText(self.README_temple.gen_About_The_Project())
-        self.buildwith_input.setPlainText(self.README_temple.gen_Build())
-        self.start_input.setPlainText(self.README_temple.gen_Getting_Started())
-        self.prerequisites_input.setPlainText(self.README_temple.gen_Prerequisites())
-        self.installation_input.setPlainText(self.README_temple.gen_Installation())
-        self.usage_input.setPlainText(self.README_temple.gen_Usage())
-        self.roadmap_input.setPlainText(self.README_temple.gen_Roadmap())
-        self.version_input.setPlainText(self.README_temple.gen_Verison())
-        self.contributing_input.setPlainText(self.README_temple.gen_Contributing())
-        self.license_input.setPlainText(self.README_temple.gen_License())
-        self.MIT_input.setPlainText(self.README_temple.gen_MIT())
-        self.contact_input.setPlainText(self.README_temple.gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
-        self.acknowledgements_input.setPlainText(self.README_temple.gen_Acknowledgments())
-
         self.MIT_layout = QHBoxLayout()
         self.MIT_layout.addWidget(self.MIT_date_label, 1)
         self.MIT_layout.addWidget(self.MIT_date_input, 2)
@@ -159,7 +148,8 @@ class App_window(QWidget):
         self.content_tree.add_items("README.md", [("Head", [], True),
                                                ("Contents", [], True),
                                                ("File Tree", [], True),
-                                               ("About The Project", ["Built With"]),
+                                            #    ("About The Project", ["Built With"]),
+                                               ("About The Project", ["Built With"], True),
                                                ("Getting Started", ["Prerequisites", "Installation"]),
                                                ("Usage", []),
                                                ("Roadmap", []),
@@ -279,55 +269,38 @@ class App_window(QWidget):
             self.folder_path_input.setText(folder_path)
             self.file_tree.clear()
             self.file_tree.add_items(self.file_tree.root, folder_path)
-            if not self.extract_file_tree():
-                self.markdown_filetree_input.setPlainText(self.README_temple.gen_Filetree(self.file_tree.get_markdown_tree()))
-            else:
-                self.markdown_filetree_input.setPlainText(self.extract_file_tree())
-            self.description_input.setPlainText(self.extract_description())
-    # TODO: 根据README 的 file_tree 勾选相应内容
+            
+            self.README_temple.extract_contents(self.folder_path_input.text() + '/README.md')
+            self.fill_README()
 
-    # 提取当前文件夹中 README 的 description
-    def extract_description(self):
-        file_path = self.folder_path_input.text() + '/README.md'
-        try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                file_content = file.read()
-                # 定义正则表达式，匹配 <p align="center"> 到下一个 <br /> 之间的内容
-                regex_pattern = r"<p align=\"center\">\s*(.*?)\s*<br />"
-                # 使用正则表达式进行匹配
-                match = re.search(regex_pattern, file_content, re.DOTALL)
-                # 提取匹配到的内容
-                if match:
-                    description = match.group(1).strip()
-                    return description
-                else:
-                    return ""
-        except:
-            pass
+    # 将已有的 README 或者 temple README 中内容填入 GUI
+    def fill_README(self):
+        self.description_input.setPlainText(self.README_temple.description)
 
-    # 提取当前文件夹中 README 的 file_tree
-    def extract_file_tree(self):
-        # 获取 README.md 文件的路径
-        file_path = os.path.join(self.folder_path_input.text(), 'README.md')
-        try:
-            # 打开 README.md 文件，读取其内容
-            with open(file_path, 'r', encoding='utf-8') as file:
-                file_content = file.read()
-                # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-                pattern = r"(<!-- FILE TREE -->\s*## File Tree\s*```\n[\s\S]*?\n```)"
-                # 使用正则表达式进行匹配
-                match = re.search(pattern, file_content, re.DOTALL)
-                # 如果匹配成功，提取并返回整个文件树块
-                if match:
-                    description = match.group(1).strip()  # 获取整个匹配的内容
-                    return description
-                else:
-                    # 如果未找到文件树部分，返回空字符串
-                    return ""
-        except Exception as e:
-            # 如果读取文件时发生错误，打印错误信息
-            print(f"读取文件时出错: {e}")
-            return ""
+        self.markdown_filetree_input.setPlainText(self.README_temple.filetree)
+        self.about_input.setPlainText(self.README_temple.about)
+        self.buildwith_input.setPlainText(self.README_temple.build)
+        self.start_input.setPlainText(self.README_temple.start)
+        self.prerequisites_input.setPlainText(self.README_temple.prerequisites)
+        self.installation_input.setPlainText(self.README_temple.installation)
+        self.usage_input.setPlainText(self.README_temple.usage)
+        self.roadmap_input.setPlainText(self.README_temple.roadmap)
+        self.version_input.setPlainText(self.README_temple.version)
+        self.contributing_input.setPlainText(self.README_temple.contributing)
+        self.license_input.setPlainText(self.README_temple.license)
+        self.MIT_input.setPlainText(self.README_temple.gen_MIT())
+        self.contact_input.setPlainText(self.README_temple.contact)
+        self.acknowledgements_input.setPlainText(self.README_temple.acknowledgments)
+
+    # 生成 about
+    def about_gen(self):
+        # 点击按钮后创建并显示文本编辑器窗口
+        self.aboutgen_window.show()
+        self.aboutgen_window.closeEvent = self.set_about
+
+    def set_about(self, event):
+        markdown_content = html2text.html2text(self.aboutgen_window.get_text())
+        self.about_input.setPlainText(markdown_content)
 
     # 发送到github仓库
     def git_send(self):
@@ -336,7 +309,7 @@ class App_window(QWidget):
         if os.path.exists(dir):
             os.chdir(dir)
         else:
-            QMessageBox.information(self, "Message", "Please select a folder")
+            print("Please select a folder")
             return
 
         # 检查当前目录是否包含.git文件夹，以确定是否已进行git初始化
@@ -395,7 +368,7 @@ class App_window(QWidget):
                     # if child_item.text(0) != '.git':
                     #     child_item.setCheckState(0, 2)  # 如果母选项选中，则开启子选项的选择功能
         # 根据用户的选择改变 markdown_filetree_input
-        self.markdown_filetree_input.setPlainText(self.README_temple.gen_Filetree(self.file_tree.get_markdown_tree()))
+        # self.markdown_filetree_input.setPlainText(self.README_temple.gen_Filetree())
 
     # 将ContentTree类的handle_item_changed函数移到这里：content_tree选项的选择要影响窗口部件
     def handle_contenttree_changed(self, item, column):
@@ -453,7 +426,7 @@ class App_window(QWidget):
                 self.file_tree.setEnabled(False)
             # 是否开启 About The Project
             if contents.get('About The Project'):
-                self.add_grid(self.about_label)
+                self.add_grid(self.about_label, self.aboutgen_button)
                 self.add_grid(self.about_input)
                 self.add_grid()
                 if contents.get('Built With'):
@@ -525,7 +498,75 @@ class App_window(QWidget):
             self.generate_run_bat()
         if self.contents.get('README.md'):
             # 生成 README.md
-            self.generate_readme()
+            content = self.content_tree.get_tree_structure()
+            print(content)
+            
+            print(self.generate_readme1(content))
+
+    def generate_readme1(self, content, level=2):
+        markdown = ""
+        for section in content:
+            for key, value in section.items():
+                if value is True:
+                    # Add the section title with corresponding heading level
+                    # markdown += f"<!-- {key.upper()} -->\n"
+                    markdown += f"{'#' * level} {key}\n\n"
+                    markdown += self.generate_sections(key)
+                    if 'children' in section and section['children']:
+                        # Recursively add the child sections
+                        markdown += self.generate_readme1(section['children'], level + 1)
+        return markdown
+
+    def generate_sections(self, section):
+        # 生成 README.md 的 Head 部分
+        if section == 'Head':
+            title = self.title_input.text()
+            description = self.description_input.toPlainText()
+            return self.README_temple.gen_Head(self.username_input.text(), self.repo_input.currentText(), title, description)
+        # 生成 README.md 的 Contents 部分
+        if section == 'Contents':
+            return self.README_temple.gen_Contents(self.contents)
+        # 生成 README.md 的 File tree 部分
+        if section == 'File Tree':
+            return self.README_temple.gen_Filetree()
+        # 生成 README.md 的 About The Project 部分
+        if section == 'About The Project':
+            return self.README_temple.gen_About()
+        if section == 'Built With':
+            return self.README_temple.gen_Build()
+        # 生成 README.md 的 Getting Started 部分
+        if section == 'Getting Started':
+            return self.README_temple.gen_Getting_Started()
+        if section == 'Prerequisites':
+            return self.README_temple.gen_Prerequisites()
+        if section == 'Installation':
+            return self.README_temple.gen_Installation()
+        # 生成 README.md 的 Usage 部分
+        if section == 'Usage':
+            return self.README_temple.gen_Usage()
+        # 生成 README.md 的 Roadmap 部分
+        if section == 'Roadmap':
+            return self.README_temple.gen_Roadmap()
+        # 生成 README.md 的 Version 部分
+        if section == 'Version':
+            return self.README_temple.gen_Verison()
+        # 生成 README.md 的 Contributing 部分
+        if section == 'Contributing':
+            return self.README_temple.gen_Contributing()
+        # 生成 README.md 的 License 部分
+        if section == 'License':
+            return self.README_temple.gen_License()
+        # 生成 README.md 的 Contact 部分
+        if section == 'Contact':
+            return self.README_temple.gen_Contact()
+        # 生成 README.md 的 Acknowledgments 部分
+        if section == 'Acknowledgments':
+            return self.README_temple.gen_Acknowledgments()
+        # 生成 README.md 的 Foot 部分
+        if section == 'Head':
+            return self.README_temple.gen_Foot(self.username_input.text(), self.repo_input.currentText())
+
+
 
     def generate_readme(self):
         username = self.username_input.text()
@@ -585,9 +626,7 @@ class App_window(QWidget):
         if self.contents.get('Head'):
             self.readme_content += self.README_temple.gen_Foot(username, repo_name)
 
-        
         self.Markdown.markdown_show(self.readme_content, self.MIT_input.toPlainText(), self.folder_path_input.text(), self.contents)
-        self.Markdown.show()
 
     def generate_requirements(self, path='.'):
         subprocess.run(['pipreqs', path, '--force'], check=True)
@@ -598,9 +637,6 @@ class App_window(QWidget):
         print(batch_content)
         with open('run.bat', 'w') as file:
             file.write(batch_content)
-
-
-
 
 
 

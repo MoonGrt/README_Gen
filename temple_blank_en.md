@@ -4,7 +4,7 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+[![License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 
@@ -16,7 +16,7 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">project_title</h3>
+  <h3 align="center">project_title</h3>
 
   <p align="center">
     project_description
@@ -62,6 +62,17 @@
 
 
 
+<!-- FILE TREE -->
+## File Tree
+
+```
+└─ Project
+  ├─ LICENSE
+  └─ README.md
+```
+
+
+
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
@@ -74,6 +85,8 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 
 
 ### Built With
+
+This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
 
 * [Next.js](https://nextjs.org/)
 * [React.js](https://reactjs.org/)
@@ -103,6 +116,8 @@ This is an example of how to list things you need to use the software and how to
   ```
 
 ### Installation
+
+_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
 
 1. Get a free API Key at [https://example.com](https://example.com)
 2. Clone the repo
@@ -146,6 +161,13 @@ See the [open issues](https://github.com/github_username/repo_name/issues) for a
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
+<!-- VERSION -->
+## Version
+
+
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -188,9 +210,16 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* []()
-* []()
-* []()
+Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
+
+* [Choose an Open Source License](https://choosealicense.com)
+* [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
+* [Malven's Flexbox Cheatsheet](https://flexbox.malven.co/)
+* [Malven's Grid Cheatsheet](https://grid.malven.co/)
+* [Img Shields](https://shields.io)
+* [GitHub Pages](https://pages.github.com)
+* [Font Awesome](https://fontawesome.com)
+* [React Icons](https://react-icons.github.io/react-icons/search)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

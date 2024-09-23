@@ -1,8 +1,232 @@
 from datetime import datetime
+import re, os
 
 class README_temple():
     def __init__(self):
-        pass
+        self.file_content = ""
+        self.temple_content = ""
+
+        self.pro_name = ""
+        self.description = ""
+        self.link = ""
+
+        self.head = ""
+        self.contents = ""
+        self.filetree = ""
+        self.about = ""
+        self.build = ""
+        self.start = ""
+        self.prerequisites = ""
+        self.installation = ""
+        self.usage = ""
+        self.roadmap = ""
+        self.version = ""
+        self.contributing = ""
+        self.license = ""
+        self.contact = ""
+        self.acknowledgments = ""
+
+
+    def extract_contents(self, file):
+        if file:
+            try:
+                with open(file, 'r', encoding='utf-8') as file:
+                    self.file_content = file.read()
+            except:
+                print("Open file error!")
+        temple = 'temple_blank_en.md'
+        with open(temple, 'r', encoding='utf-8') as file:
+            self.temple_content = file.read()
+
+        self.extract_proname()
+        self.extract_description()
+        self.extract_filetree()
+        self.extract_about()
+        self.extract_build()
+        self.extract_start()
+        self.extract_prerequisites()
+        self.extract_installation()
+        self.extract_usage()
+        self.extract_roadmap()
+        self.extract_version()
+        self.extract_contributing()
+        self.extract_license()
+        self.extract_contact()
+        self.extract_acknowledgments()
+
+    # 提取当前文件中 README 的 project name
+    def extract_proname(self):
+        # 定义正则表达式，匹配 <p align="center"> 到下一个 <br /> 之间的内容
+        pattern = r'<h3 align="center">(.*?)</h3>'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 提取匹配到的内容
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.pro_name = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 description
+    def extract_description(self):
+        # 定义正则表达式，匹配 <p align="center"> 到下一个 <br /> 之间的内容
+        pattern = r"<p align=\"center\">\s*(.*?)\s*<br />"
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 提取匹配到的内容
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.description = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 filetree
+    def extract_filetree(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r"<!-- FILE TREE -->\s*## File Tree\s*```(.*?)```"
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.filetree = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 About The Project
+    def extract_about(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'<!-- ABOUT THE PROJECT -->\s*## About The Project(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.about = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Built With
+    def extract_build(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'### Built With(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.build = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Getting Started
+    def extract_start(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'<!-- GETTING STARTED -->\s*## Getting Started(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.start = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Prerequisites
+    def extract_prerequisites(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'### Prerequisites(.*?)### Installation'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.prerequisites = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Installation
+    def extract_installation(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'### Installation(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.installation = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Usage
+    def extract_usage(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'<!-- USAGE EXAMPLES -->\s*## Usage(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.usage = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Roadmap
+    def extract_roadmap(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'<!-- ROADMAP -->\s*## Roadmap(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.roadmap = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Version
+    def extract_version(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'<!-- VERSION -->\s*## Version(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.version = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Contributing
+    def extract_contributing(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'<!-- CONTRIBUTING -->\s*## Contributing(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.contributing = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Licence
+    def extract_license(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'<!-- LICENSE -->\s*## License(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.license = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Contact
+    def extract_contact(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'<!-- CONTACT -->\s*## Contact(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.contact = match.group(1).strip()  # 获取整个匹配的内容
+
+    # 提取当前文件中 README 的 Acknowledgments
+    def extract_acknowledgments(self):
+        # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
+        pattern = r'<!-- ACKNOWLEDGMENTS -->\s*## Acknowledgments(.*?)<p align="right">'
+        # 使用正则表达式进行匹配
+        match = re.search(pattern, self.file_content, re.DOTALL)
+        # 如果匹配成功，提取并返回整个文件树块
+        if not match:
+            match = re.search(pattern, self.temple_content, re.DOTALL)
+        self.acknowledgments = match.group(1).strip()  # 获取整个匹配的内容
+
+
+
+
+
+
+
+    def gen_topid(self):
+        return """<div id="top"></div>"""
 
     def gen_toplink(self):
         return """<p align="right">(<a href="#top">top</a>)</p>"""
@@ -10,13 +234,11 @@ class README_temple():
     # 生成 README.md 的 Head 部分
     def gen_Head(self, username, repo_name, title, description):
         return f"""
-<div id="top"></div>
-
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+[![License][license-shield]][license-url]
 
 
 <!-- PROJECT LOGO -->
@@ -130,178 +352,50 @@ class README_temple():
 
         return Contents
 
+
     # 生成 README.md 的 Filetree 部分
-    def gen_Filetree(self, Filetree):
-        return f"""
-<!-- FILE TREE -->
-## File Tree
-
-```
-{Filetree}
-```
-
-"""
+    def gen_Filetree(self):
+        return f"""'''\n{self.filetree}\n'''"""
 
     # 生成 README.md 的 About The Project 部分
-    def gen_About_The_Project(self):
-        return f"""
-<!-- ABOUT THE PROJECT -->
-## About The Project
-
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
-
-"""
+    def gen_About(self):
+        return f"""{self.about}"""
 
     # 生成 README.md 的 Build 部分
     def gen_Build(self):
-        return f"""
-### Built With
-
-* [Next.js](https://nextjs.org/)
-* [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
-
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
+        return f"""{self.build}"""
 
     # 生成 README.md 的 Getting Started 部分
     def gen_Getting_Started(self):
-        return f"""
-<!-- GETTING STARTED -->
-## Getting Started
-
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-
-"""
+        return f"""{self.start}"""
 
     # 生成 README.md 的 Prerequisites 部分
     def gen_Prerequisites(self):
-        return f"""
-### Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-```sh
-npm install npm@latest -g
-```
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
+        return f"""{self.prerequisites}"""
 
     # 生成 README.md 的 Installation 部分
     def gen_Installation(self):
-        return f"""
-### Installation
-
-Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
-
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-```sh
-git clone https://github.com/your_username_/Project-Name.git
-```
-3. Install NPM packages
-```sh
-npm install
-```
-4. Enter your API in `config.js`
-```js
-const API_KEY = 'ENTER YOUR API';
-```
-
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
+        return f"""{self.installation}"""
 
     # 生成 README.md 的 Usage 部分
     def gen_Usage(self):
-        return f"""
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
+        return f"""{self.usage}"""
 
     # 生成 README.md 的 Roadmap 部分
     def gen_Roadmap(self):
-        return f"""
-<!-- ROADMAP -->
-## Roadmap
-
-- [x] Add Changelog
-- [x] Add top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
-
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
+        return f"""{self.roadmap}"""
 
     # 生成 README.md 的 Verison 部分
     def gen_Verison(self):
-        return f"""
-<!-- Version -->
-## Version
-
-- [x] Add Changelog
-- [x] Add top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
-
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
+        return f"""{self.version}"""
 
     # 生成 README.md 的 Contributing 部分
     def gen_Contributing(self):
-        return f"""
-<!-- CONTRIBUTING -->
-## Contributing
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
+        return f"""{self.contributing}"""
 
     # 生成 README.md 的 License 部分
     def gen_License(self):
-        return f"""
-<!-- LICENSE -->
-## License
-Distributed under the MIT License. See `LICENSE` for more information.
-<p align="right">(<a href="#top">top</a>)</p>
-
-"""
+        return f"""{self.license}"""
 
     # 生成 MIT licsense
     def gen_MIT(self, year=datetime.now().year, author_name='MoonGrt'):
@@ -331,32 +425,22 @@ SOFTWARE.
 """
 
     # 生成 README.md 的 Contact 部分
-    def gen_Contact(self, username, repo_name, mail_address):
-        return f"""
-<!-- CONTACT -->
-## Contact
-{username} - {mail_address}
-Project Link: [{username}/{repo_name}](https://github.com/{username}/{repo_name})
-<p align="right">(<a href="#top">top</a>)</p>
+#     def gen_Contact(self, username, repo_name, mail_address):
+#         return f"""
+# <!-- CONTACT -->
+# ## Contact
+# {username} - {mail_address}
+# Project Link: [{username}/{repo_name}](https://github.com/{username}/{repo_name})
+# <p align="right">(<a href="#top">top</a>)</p>
 
-"""
+# """
+    def gen_Contact(self):
+        return f"""{self.contact}"""
 
     # 生成 README.md 的 Acknowledgments 部分
     def gen_Acknowledgments(self):
-        return f"""
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-* [Choose an Open Source License](https://choosealicense.com)
-* [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
-* [Malven's Flexbox Cheatsheet](https://flexbox.malven.co/)
-* [Malven's Grid Cheatsheet](https://grid.malven.co/)
-* [Img Shields](https://shields.io)
-* [GitHub Pages](https://pages.github.com)
-* [Font Awesome](https://fontawesome.com)
-* [React Icons](https://react-icons.github.io/react-icons/search)
-<p align="right">(<a href="#top">top</a>)</p>
+        return f"""{self.acknowledgments}"""
 
-"""
 
     # 生成 README.md 的 Foot 部分
     def gen_Foot(self, username, repo_name):
@@ -375,7 +459,28 @@ Project Link: [{username}/{repo_name}](https://github.com/{username}/{repo_name}
 [license-url]: https://github.com/{username}/{repo_name}/blob/master/LICENSE
 
 """
+    
+
+
 
 
 if __name__ == '__main__':
-    print()
+    README_content = README_temple()
+    README_content.extract_contents('temple_blank_en.md')
+    # README_content.extract_contents('README.md')
+
+    # print(README_content.pro_name + '\n')
+    # print(README_content.description + '\n')
+    # print(README_content.filetree + '\n')
+    # print(README_content.about + '\n')
+    # print(README_content.build + '\n')
+    # print(README_content.start + '\n')
+    # print(README_content.prerequisites + '\n')
+    # print(README_content.installation + '\n')
+    # print(README_content.usage + '\n')
+    # print(README_content.roadmap + '\n')
+    # print(README_content.version + '\n')
+    # print(README_content.contributing + '\n')
+    # print(README_content.license + '\n')
+    # print(README_content.contact + '\n')
+    # print(README_content.acknowledgments + '\n')
