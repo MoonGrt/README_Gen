@@ -109,7 +109,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Contact
 
 MoonGrt - 1561145394@qq.com
-Project Link: [MoonGrt/](https://github.com/MoonGrt/)
+Project Link: [MoonGrt](https://github.com/MoonGrt/)
 <p align="right">(<a href="#top">top</a>)</p>
 
 

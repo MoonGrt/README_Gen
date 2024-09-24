@@ -339,11 +339,15 @@ class App_window(QWidget):
     # 生成 about
     def about_gen(self):
         # 点击按钮后创建并显示文本编辑器窗口
+        self.aboutgen_window.gen_button.clicked.connect(self.set_about)
         self.aboutgen_window.show()
-        self.aboutgen_window.closeEvent = self.set_about
 
     def set_about(self, event):
-        self.about_input.setPlainText(self.aboutgen_window.get_text())
+        about_text = self.aboutgen_window.get_text()
+        about_text = about_text.replace(self.project_path + '/', '')
+        self.about_input.setPlainText(about_text)
+
+        self.aboutgen_window.close()
 
     # 发送到github仓库
     def git_send(self):

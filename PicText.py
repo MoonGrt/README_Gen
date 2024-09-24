@@ -1,5 +1,4 @@
-import sys
-import os
+import sys, os, html2text, markdown, re
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QAction, QFileDialog, QVBoxLayout, QPushButton, QWidget
 from PyQt5.QtGui import QIcon, QImage, QTextCursor, QTextBlockFormat
 from PyQt5.QtCore import Qt, QUrl
@@ -70,7 +69,7 @@ class PicText(QMainWindow):
 
         # 添加提交按钮
         self.gen_button = QPushButton("Gen", self)
-        self.gen_button.clicked.connect(self.close)
+        # self.gen_button.clicked.connect(self.test)
 
         # 添加按钮布局
         layout = QVBoxLayout()
@@ -111,15 +110,43 @@ class PicText(QMainWindow):
                 self.text_edit.setTextCursor(cursor)
 
     def get_text(self):
-        return self.text_edit.toHtml()
+        html = self.text_edit.toHtml()
+        markdown_content = html2text.html2text(html)
+        return markdown_content
 
-    def printf(self, event):
-        print(self.get_text())
+    def test(self):
+        html = self.text_edit.toHtml()
+        markdown_content = html2text.html2text(html)
+        html_content = markdown.markdown(markdown_content)
+        print(html)
+        print('-----------------------------------------------------------------')
+        print(markdown_content)
+        # markdown_content = self.center_images_in_markdown(markdown_content)
+        # print(markdown_content)
+        print('-----------------------------------------------------------------')
+        print(html_content)
+        self.text_edit.setHtml(html_content)
+
+    def center_images_in_markdown(self, markdown_text):
+        # 定义正则表达式，匹配 Markdown 图片格式 ![alt text](image_url)
+        img_pattern = r'!\[([^\]]*)\]\(([^)]+)\)'
+        
+        # 替换为居中的 HTML 格式
+        def replace_with_centered_html(match):
+            alt_text = match.group(1)
+            img_url = match.group(2)
+            # 用HTML div 和 img标签将图片居中
+            return f'<div style="text-align:center;"><img src="{img_url}" alt="{alt_text}" /></div>'
+        
+        # 使用正则表达式进行替换
+        centered_markdown = re.sub(img_pattern, replace_with_centered_html, markdown_text)
+        
+        return centered_markdown
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     editor = PicText()
     editor.show()
-    editor.closeEvent = editor.printf
+    # editor.closeEvent = editor.get_text
     sys.exit(app.exec_())
