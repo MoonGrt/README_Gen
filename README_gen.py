@@ -1,6 +1,6 @@
-import sys, os, subprocess, requests, re
+import sys, os, subprocess, requests, shutil
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QPlainTextEdit, QFrame, QGridLayout, QComboBox
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QFileDialog, QScrollArea, QSizePolicy, QTextEdit
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QFileDialog, QScrollArea, QSizePolicy, QTextEdit, QMessageBox
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from datetime import datetime
@@ -9,7 +9,6 @@ from FileTree import FileTree
 from ContentTree import ContentTree
 from README_temple import README_temple
 from PicText import PicText
-import html2text
 
 class App_window(QWidget):
     def __init__(self):
@@ -18,6 +17,7 @@ class App_window(QWidget):
         self.README_temple = README_temple()
         self.aboutgen_window = PicText()
 
+        self.project_path = ''
         self.readme_content = ''
         self.contents = {}
         self.init_ui()
@@ -33,7 +33,6 @@ class App_window(QWidget):
         self.username_label = QLabel('GitHub Username:')
         self.username_input = QLineEdit()
         self.repo_label = QLabel('Repository Name:')
-        # self.repo_input = QLineEdit()
         self.repo_input = QComboBox(self)
         self.mail_label = QLabel('Mail address:')
         self.mail_input = QLineEdit()
@@ -49,8 +48,8 @@ class App_window(QWidget):
         self.description_input.setFixedHeight(80)  # 200
         # File tree 信息
         self.markdown_filetree_label = QLabel('Fire Tree:')
-        self.markdown_filetree_input = QPlainTextEdit()
-        self.markdown_filetree_input.setFixedHeight(200)
+        self.filetree_input = QPlainTextEdit()
+        self.filetree_input.setFixedHeight(200)
         # About The Project 信息
         self.about_label = QLabel('About The Project:')
         self.about_input = QTextEdit()
@@ -128,7 +127,6 @@ class App_window(QWidget):
         if repositories:
             for repo in repositories:
                 self.repo_input.addItem(repo["name"])
-        self.title_input.setText(self.repo_input.currentText())
 
         # 信息链接
         self.username_input.textChanged.connect(self.handle_username_change)
@@ -246,6 +244,41 @@ class App_window(QWidget):
     def handle_MIT_name_change(self, new_text):
         self.MIT_input.setPlainText(self.README_temple.gen_MIT(self.MIT_date_input.text(), self.MIT_name_input.text()))
 
+    # 将 ContentTree 类的 handle_item_changed 函数移到这里：content_tree选项的选择要影响窗口部件
+    def handle_contenttree_changed(self, item, column):
+        # 处理选项状态改变时的逻辑
+        if item.childCount() > 0:  # 只处理文件夹
+            if item.checkState(0) == 0:
+                for i in range(item.childCount()):
+                    child_item = item.child(i)
+                    # child_item.setCheckState(0, 0)  # 如果母选项未选中，则禁用子选项的选择功能
+                    child_item.setDisabled(True)
+            elif item.checkState(0) == 2:
+                for i in range(item.childCount()):
+                    child_item = item.child(i)
+                    # child_item.setCheckState(0, 2)  # 如果母选项选中，则开启子选项的选择功能
+                    child_item.setDisabled(False)
+        contents = self.content_tree.get_items_state()
+        self.update_form_layout(contents)
+
+    # 将 FileTree 类的 handle_item_changed 函数移到这里：file_tree选项的选择要影响窗口内容
+    def handle_filetree_changed(self, item, column):
+        # 处理选项状态改变时的逻辑
+        if item.childCount() > 0 and (item.text(0) != '.git'):  # 只处理文件夹
+            if item.checkState(0) == 0:
+                for i in range(item.childCount()):
+                    child_item = item.child(i)
+                    child_item.setCheckState(0, 0)  # 如果母选项未选中，则禁用子选项的选择功能
+                    child_item.setDisabled(True)
+            elif item.checkState(0) == 2:
+                if item.childCount() < 10:
+                    for i in range(item.childCount()):
+                        child_item = item.child(i)
+                        child_item.setDisabled(False)
+                        child_item.setCheckState(0, 2)  # 如果母选项选中，则开启子选项的选择功能
+        # 根据用户的选择改变 filetree_input
+        self.filetree_input.setPlainText(self.file_tree.get_filetree())
+
     # 设置每列的宽度比例
     def set_gridcolwidth_ratios(self, ratios):
         for col, ratio in enumerate(ratios):
@@ -266,31 +299,42 @@ class App_window(QWidget):
     def browse_folder(self):
         folder_path = QFileDialog.getExistingDirectory(self, "Select File or Folder")
         if folder_path:
+            self.project_path = folder_path
             self.folder_path_input.setText(folder_path)
+
             self.file_tree.clear()
             self.file_tree.add_items(self.file_tree.root, folder_path)
-            
             self.README_temple.extract_contents(self.folder_path_input.text() + '/README.md')
-            self.fill_README()
 
-    # 将已有的 README 或者 temple README 中内容填入 GUI
-    def fill_README(self):
-        self.description_input.setPlainText(self.README_temple.description)
+            # 向 GUI 填入文字
+            if not self.README_temple.filetree:
+                self.README_temple.set_filetree(self.file_tree.get_filetree())
+            else:
+                self.file_tree.set_filetree(self.README_temple.filetree)
 
-        self.markdown_filetree_input.setPlainText(self.README_temple.filetree)
-        self.about_input.setPlainText(self.README_temple.about)
-        self.buildwith_input.setPlainText(self.README_temple.build)
-        self.start_input.setPlainText(self.README_temple.start)
-        self.prerequisites_input.setPlainText(self.README_temple.prerequisites)
-        self.installation_input.setPlainText(self.README_temple.installation)
-        self.usage_input.setPlainText(self.README_temple.usage)
-        self.roadmap_input.setPlainText(self.README_temple.roadmap)
-        self.version_input.setPlainText(self.README_temple.version)
-        self.contributing_input.setPlainText(self.README_temple.contributing)
-        self.license_input.setPlainText(self.README_temple.license)
-        self.MIT_input.setPlainText(self.README_temple.gen_MIT())
-        self.contact_input.setPlainText(self.README_temple.contact)
-        self.acknowledgements_input.setPlainText(self.README_temple.acknowledgments)
+            index = self.repo_input.findText(self.README_temple.pro_name)
+            if index == -1:
+                self.repo_input.setCurrentIndex(-1)
+                self.title_input.setText(self.README_temple.pro_name)
+            else:
+                self.repo_input.setCurrentIndex(index)
+
+            self.description_input.setPlainText(self.README_temple.description)
+
+            self.filetree_input.setPlainText(self.README_temple.filetree)
+            self.about_input.setPlainText(self.README_temple.about)
+            self.buildwith_input.setPlainText(self.README_temple.build)
+            self.start_input.setPlainText(self.README_temple.start)
+            self.prerequisites_input.setPlainText(self.README_temple.prerequisites)
+            self.installation_input.setPlainText(self.README_temple.installation)
+            self.usage_input.setPlainText(self.README_temple.usage)
+            self.roadmap_input.setPlainText(self.README_temple.roadmap)
+            self.version_input.setPlainText(self.README_temple.version)
+            self.contributing_input.setPlainText(self.README_temple.contributing)
+            self.license_input.setPlainText(self.README_temple.license)
+            self.MIT_input.setPlainText(self.README_temple.gen_MIT())
+            self.contact_input.setPlainText(self.README_temple.contact)
+            self.acknowledgements_input.setPlainText(self.README_temple.acknowledgments)
 
     # 生成 about
     def about_gen(self):
@@ -299,8 +343,7 @@ class App_window(QWidget):
         self.aboutgen_window.closeEvent = self.set_about
 
     def set_about(self, event):
-        markdown_content = html2text.html2text(self.aboutgen_window.get_text())
-        self.about_input.setPlainText(markdown_content)
+        self.about_input.setPlainText(self.aboutgen_window.get_text())
 
     # 发送到github仓库
     def git_send(self):
@@ -352,41 +395,6 @@ class App_window(QWidget):
 
         print(f"Changes pushed to {current_branch} on GitHub.")
 
-    # 将FileTree类的handle_item_changed函数移到这里：file_tree选项的选择要影响窗口内容
-    def handle_filetree_changed(self, item, column):
-        # 处理选项状态改变时的逻辑
-        if item.childCount() > 0:  # 只处理文件夹
-            if item.checkState(0) == 0:
-                for i in range(item.childCount()):
-                    child_item = item.child(i)
-                    child_item.setCheckState(0, 0)  # 如果母选项未选中，则禁用子选项的选择功能
-                    child_item.setDisabled(True)
-            elif item.checkState(0) == 2:
-                for i in range(item.childCount()):
-                    child_item = item.child(i)
-                    child_item.setDisabled(False)
-                    # if child_item.text(0) != '.git':
-                    #     child_item.setCheckState(0, 2)  # 如果母选项选中，则开启子选项的选择功能
-        # 根据用户的选择改变 markdown_filetree_input
-        # self.markdown_filetree_input.setPlainText(self.README_temple.gen_Filetree())
-
-    # 将ContentTree类的handle_item_changed函数移到这里：content_tree选项的选择要影响窗口部件
-    def handle_contenttree_changed(self, item, column):
-        # 处理选项状态改变时的逻辑
-        if item.childCount() > 0:  # 只处理文件夹
-            if item.checkState(0) == 0:
-                for i in range(item.childCount()):
-                    child_item = item.child(i)
-                    # child_item.setCheckState(0, 0)  # 如果母选项未选中，则禁用子选项的选择功能
-                    child_item.setDisabled(True)
-            elif item.checkState(0) == 2:
-                for i in range(item.childCount()):
-                    child_item = item.child(i)
-                    # child_item.setCheckState(0, 2)  # 如果母选项选中，则开启子选项的选择功能
-                    child_item.setDisabled(False)
-        contents = self.content_tree.get_items_state()
-        self.update_form_layout(contents)
-
     # 根据用户选择的内容更新窗口
     def update_form_layout(self, contents):
         # 清空self.grid_layout
@@ -419,7 +427,7 @@ class App_window(QWidget):
             # 是否开启 Filetree
             if contents.get('File Tree'):
                 self.add_grid(self.markdown_filetree_label)
-                self.add_grid(self.markdown_filetree_input)
+                self.add_grid(self.filetree_input)
                 self.file_tree.setEnabled(True)
                 self.add_grid()
             else:
@@ -489,33 +497,69 @@ class App_window(QWidget):
         self.set_gridcolwidth_ratios([1, 2])
 
     def GEN(self):
-        self.contents = self.content_tree.get_items_state()
-        if self.contents.get('requirements.txt'):
+        if self.content_tree.root.child(2).checkState(0) == 2:  # requirements.txt
             # 生成 requirements.txt
             self.generate_requirements()
-        if self.contents.get('run.bat'):
+        if self.content_tree.root.child(1).checkState(0) == 2:  # run.bat
             # 生成 run.bat
             self.generate_run_bat()
-        if self.contents.get('README.md'):
+        if self.content_tree.root.child(0).checkState(0) == 2:  # README.md
             # 生成 README.md
-            content = self.content_tree.get_tree_structure()
-            print(content)
-            
-            print(self.generate_readme1(content))
+            self.contents = self.content_tree.get_tree_content()
+            self.readme_content = self.generate_markdown(self.contents)
 
-    def generate_readme1(self, content, level=2):
-        markdown = ""
-        for section in content:
-            for key, value in section.items():
-                if value is True:
-                    # Add the section title with corresponding heading level
-                    # markdown += f"<!-- {key.upper()} -->\n"
-                    markdown += f"{'#' * level} {key}\n\n"
-                    markdown += self.generate_sections(key)
-                    if 'children' in section and section['children']:
-                        # Recursively add the child sections
-                        markdown += self.generate_readme1(section['children'], level + 1)
-        return markdown
+            self.Markdown.confirm_button.clicked.connect(self.markdown_confirm)
+            self.Markdown.markdown_show(self.readme_content, self.folder_path_input.text())
+
+    def markdown_confirm(self):
+        if self.project_path:
+            self.copy_images()
+            # 将 readme_content 内容保存到文件中
+            readme_path = self.project_path + '/README.md'
+            with open(readme_path, 'w', encoding='utf-8') as readme_file:
+                readme_file.write(self.Markdown.markdown)
+            print(f"README.md generated successfully at {readme_path}")
+        else:
+            QMessageBox.information(self, "Message", "Please select a folder")
+        self.Markdown.close()
+
+    def copy_images(self):
+        destination_folder = os.path.join(self.project_path, 'images')  # 目标文件夹的 images 目录
+        destination_path = os.path.join(destination_folder, 'logo.png')  # 定义目标文件路径
+        if not os.path.exists(destination_path):
+            source_path = os.path.join(os.getcwd(), 'images', 'logo.png')  # 当前文件夹下 images/logo.png
+            # 确保目标文件夹存在，如果不存在则创建
+            os.makedirs(destination_folder, exist_ok=True)
+            try:
+                # 复制文件
+                shutil.copy(source_path, destination_path)
+                print(f'Images copied to {destination_path}')
+            except shutil.Error as e:
+                print(f"Copy 'images' error: {e}")
+            except Exception as e:
+                print(f"{e}")
+        # else:
+        #     print("logo.png already existed")
+
+    def generate_markdown(self, content):
+        markdown_text = ""
+        for title, level, is_checked in content:
+            if not level:  # 舍弃第一层
+                continue
+            if is_checked:
+                # Add the section title with corresponding heading level
+                if title == "Head":
+                    markdown_text += self.README_temple.gen_topid() + '\n'
+                elif title == "Contents":
+                    pass
+                else:
+                    markdown_text += f"<!-- {title.upper()} -->\n"
+                    # markdown_text += f"{'#' * level} {name}\n\n"
+                    markdown_text += f"{'#' * (level+1)} {title}\n\n"
+                markdown_text += self.generate_sections(title) + '\n\n\n\n'
+        link = self.README_temple.gen_Link(self.username_input.text(), self.repo_input.currentText())
+        # link += 
+        return markdown_text + link
 
     def generate_sections(self, section):
         # 生成 README.md 的 Head 部分
@@ -525,108 +569,57 @@ class App_window(QWidget):
             return self.README_temple.gen_Head(self.username_input.text(), self.repo_input.currentText(), title, description)
         # 生成 README.md 的 Contents 部分
         if section == 'Contents':
-            return self.README_temple.gen_Contents(self.contents)
+            return self.README_temple.gen_Contents(self.content_tree.get_items_state())
         # 生成 README.md 的 File tree 部分
         if section == 'File Tree':
-            return self.README_temple.gen_Filetree()
+            return "```\n" + self.filetree_input.toPlainText() + "\n```"
         # 生成 README.md 的 About The Project 部分
         if section == 'About The Project':
-            return self.README_temple.gen_About()
+            return self.about_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         if section == 'Built With':
-            return self.README_temple.gen_Build()
+            return self.buildwith_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 Getting Started 部分
         if section == 'Getting Started':
-            return self.README_temple.gen_Getting_Started()
+            return self.start_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         if section == 'Prerequisites':
-            return self.README_temple.gen_Prerequisites()
+            return self.prerequisites_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         if section == 'Installation':
-            return self.README_temple.gen_Installation()
+            return self.installation_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 Usage 部分
         if section == 'Usage':
-            return self.README_temple.gen_Usage()
+            return self.usage_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 Roadmap 部分
         if section == 'Roadmap':
-            return self.README_temple.gen_Roadmap()
+            return self.roadmap_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 Version 部分
         if section == 'Version':
-            return self.README_temple.gen_Verison()
+            return self.version_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 Contributing 部分
         if section == 'Contributing':
-            return self.README_temple.gen_Contributing()
+            return self.contributing_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 License 部分
         if section == 'License':
-            return self.README_temple.gen_License()
+            self.generate_license()
+            return self.license_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 Contact 部分
         if section == 'Contact':
-            return self.README_temple.gen_Contact()
+            return self.contact_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 Acknowledgments 部分
         if section == 'Acknowledgments':
-            return self.README_temple.gen_Acknowledgments()
-        # 生成 README.md 的 Foot 部分
-        if section == 'Head':
-            return self.README_temple.gen_Foot(self.username_input.text(), self.repo_input.currentText())
+            return self.acknowledgements_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
 
-
-
-    def generate_readme(self):
-        username = self.username_input.text()
-        repo_name = self.repo_input.currentText()
-        self.readme_content = ''
-
-        # 生成 README.md 的 Head 部分
-        if self.contents.get('Head'):
-            title = self.title_input.text()
-            description = self.description_input.toPlainText()
-            self.readme_content += self.README_temple.gen_Head(username, repo_name, title, description)
-        # 生成 README.md 的 Contents 部分
-        if self.contents.get('Contents'):
-            self.readme_content += self.README_temple.gen_Contents(self.contents)
-        # 生成 README.md 的 File tree 部分
-        if self.contents.get('File Tree'):
-            # self.readme_content += gen_Filetree(self.file_tree.get_markdown_tree())
-            self.readme_content += self.markdown_filetree_input.toPlainText()
-        # 生成 README.md 的 About The Project 部分
-        if self.contents.get('About The Project'):
-            self.readme_content += self.about_input.toPlainText()
-            if self.contents.get('Built With'):
-                self.readme_content += self.buildwith_input.toPlainText()
-        # 生成 README.md 的 Getting Started 部分
-        if self.contents.get('Getting Started'):
-            self.readme_content += self.start_input.toPlainText()
-            if self.contents.get('Prerequisites'):
-                self.readme_content += self.prerequisites_input.toPlainText()
-            if self.contents.get('Installation'):
-                self.readme_content += self.installation_input.toPlainText()
-        # 生成 README.md 的 Usage 部分
-        if self.contents.get('Usage'):
-            self.readme_content += self.usage_input.toPlainText()
-        # 生成 README.md 的 Roadmap 部分
-        if self.contents.get('Roadmap'):
-            self.readme_content += self.roadmap_input.toPlainText()
-        # 生成 README.md 的 Version 部分
-        if self.contents.get('Version'):
-            self.readme_content += self.version_input.toPlainText()
-        # 生成 README.md 的 Contributing 部分
-        if self.contents.get('Contributing'):
-            # self.readme_content += gen_Contributing()
-            self.readme_content += self.contributing_input.toPlainText()
-        # 生成 README.md 的 License 部分
-        if self.contents.get('License'):
-            # self.readme_content += gen_License()
-            self.readme_content += self.license_input.toPlainText()
-        # 生成 README.md 的 Contact 部分
-        if self.contents.get('Contact'):
-            # self.readme_content += gen_Contact(username, repo_name, mail_address)
-            self.readme_content += self.contact_input.toPlainText()
-        # 生成 README.md 的 Acknowledgments 部分
-        if self.contents.get('Acknowledgments'):
-            # self.readme_content += gen_Acknowledgments()
-            self.readme_content += self.acknowledgements_input.toPlainText()
-        # 生成 README.md 的 Foot 部分
-        if self.contents.get('Head'):
-            self.readme_content += self.README_temple.gen_Foot(username, repo_name)
-
-        self.Markdown.markdown_show(self.readme_content, self.MIT_input.toPlainText(), self.folder_path_input.text(), self.contents)
+    def generate_license(self):
+        if self.project_path:
+            if not os.path.exists(self.project_path + '/LICENSE'):
+                # 将 License 内容保存到文件中
+                license_path = self.project_path + '/LICENSE'
+                with open(license_path, 'w', encoding='utf-8') as license_file:
+                    license_file.write(self.MIT_input.toPlainText())
+                print(f"LICENSE generated successfully at {license_path}")
+            # else:
+            #     print("LICENSE already existed")
+        else:
+            print("Please select a folder")
 
     def generate_requirements(self, path='.'):
         subprocess.run(['pipreqs', path, '--force'], check=True)
@@ -650,14 +643,10 @@ if __name__ == '__main__':
 
 
 
-# TODO: 如果文件夹下有 README 则将相应内容填充到窗口，文件树的填充有问题
-# TODO: 自动识别仓库名
+
 # TODO: 添加对git异常的处理：fatal: detected dubious ownership in repository at 'U:/xxx'
 #       添加 ”git config --global --add safe.directory U:/xxx“
-# TODO: 新建文件（图片等）后更新文件树
 # TODO: 添加“图片展示功能”
 # TODO: 中英文版本
 # TODO: 添加release版本控制
-# TODO: 添加版本更新说明
-
 # TODO: git branch

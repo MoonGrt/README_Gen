@@ -1,5 +1,5 @@
 from datetime import datetime
-import re, os
+import re
 
 class README_temple():
     def __init__(self):
@@ -27,13 +27,16 @@ class README_temple():
         self.acknowledgments = ""
 
 
+    def set_filetree(self, filetree):
+        self.filetree = filetree
+
     def extract_contents(self, file):
         if file:
             try:
                 with open(file, 'r', encoding='utf-8') as file:
                     self.file_content = file.read()
             except:
-                print("Open file error!")
+                print("No README.md!")
         temple = 'temple_blank_en.md'
         with open(temple, 'r', encoding='utf-8') as file:
             self.temple_content = file.read()
@@ -76,7 +79,7 @@ class README_temple():
             match = re.search(pattern, self.temple_content, re.DOTALL)
         self.description = match.group(1).strip()  # 获取整个匹配的内容
 
-    # 提取当前文件中 README 的 filetree
+    # 提取当前文件中 README 的 File Tree
     def extract_filetree(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
         pattern = r"<!-- FILE TREE -->\s*## File Tree\s*```(.*?)```"
@@ -261,7 +264,6 @@ class README_temple():
     <a href="https://github.com/{username}/{repo_name}/issues">Request Feature</a>
     </p>
 </div>
-
 """
 
     # # pattern 1
@@ -308,7 +310,7 @@ class README_temple():
     # pattern 2
     # 生成 README.md 的 Contents 部分
     def gen_Contents(self, contents):
-        Contents = """\n<!-- CONTENTS -->\n<details open>\n  <summary>Contents</summary>\n  <ol>\n"""
+        Contents = """<!-- CONTENTS -->\n<details open>\n  <summary>Contents</summary>\n  <ol>\n"""
 
         # 是否开启 Filetree
         if contents.get('File Tree'):
@@ -443,7 +445,7 @@ SOFTWARE.
 
 
     # 生成 README.md 的 Foot 部分
-    def gen_Foot(self, username, repo_name):
+    def gen_Link(self, username, repo_name):
         return f"""
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
@@ -459,7 +461,7 @@ SOFTWARE.
 [license-url]: https://github.com/{username}/{repo_name}/blob/master/LICENSE
 
 """
-    
+
 
 
 

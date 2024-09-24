@@ -34,7 +34,7 @@
 
 
 
-<!-- TABLE OF CONTENTS -->
+<!-- CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
   <ol>
@@ -66,9 +66,7 @@
 ## File Tree
 
 ```
-└─ Project
-  ├─ LICENSE
-  └─ README.md
+
 ```
 
 

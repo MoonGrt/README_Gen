@@ -70,30 +70,20 @@ class ContentTree(QTreeWidget):
                     # child_item.setCheckState(0, 2)
                     child_item.setDisabled(False)  # 如果母选项选中，则开启子选项的选择功能
 
-    # 新增函数：返回树状结构和选中状态
-    def get_tree_structure(self, item=None):
+    # 递归获取所有项的名称、层级和选中状态
+    def get_tree_content(self, item=None, level=0):
         if item is None:
-            item = self.root.child(0)  # REAMDE.md 分支
-        tree_structure = []
+            item = self.root
+        content = []
         for i in range(item.childCount()):
             child = item.child(i)
-            child_data = child.text(0)
-            # 获取节点的选中状态：2 表示选中，1 表示部分选中，0 表示未选中
-            is_checked = child.checkState(0) == 2
-            child_tree = self.get_tree_structure(child)
-            # 如果子节点有子项，递归添加到列表，并包含选中状态
-            if child_tree:
-                tree_structure.append({
-                    child_data: is_checked,
-                    'children': child_tree
-                })
-            else:
-                tree_structure.append({
-                    child_data: is_checked,
-                    'children': None
-                })
-        return tree_structure
-
+            item_name = child.text(0)
+            item_level = level
+            is_checked = child.checkState(0) == 2  # 复选框状态为2表示选中
+            content.append((item_name, item_level, is_checked))
+            # 递归获取子项的内容
+            content += self.get_tree_content(child, level + 1)
+        return content
 
 # Function to generate markdown from the section structure
 def generate_readme(sections, level=1):
@@ -108,7 +98,17 @@ def generate_readme(sections, level=1):
                     markdown += generate_readme(section['children'], level + 1)
     return markdown
 
-
+def generate_markdown(content):
+    markdown_text = ""
+    for name, level, is_checked in content:
+        if not level:  # 舍弃第一层
+            continue
+        if is_checked:
+            # Add the section title with corresponding heading level
+            markdown_text += f"<!-- {name.upper()} -->\n"
+            # markdown_text += f"{'#' * level} {name}\n\n"
+            markdown_text += f"{'#' * (level+1)} {name}\n\n"
+    return markdown_text
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -142,10 +142,10 @@ if __name__ == '__main__':
     window.resize(400, 300)
     window.show()  # 显示窗口
 
-    content = content_tree.get_tree_structure()
+    content = content_tree.get_tree_content()
     print(content)
-    print(generate_readme(content))
-    # print(content_tree.root.child(0).text(0))
-    # print(content_tree.root.child(0).checkState(0))
+    print(generate_markdown(content))
+
+    print(content_tree.get_items_state())
 
     sys.exit(app.exec_())  # 运行应用程序
