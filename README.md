@@ -1,3 +1,4 @@
+**English | [简体中文](README_cn.md)**<br>
 <div id="top"></div>
 
 [![Contributors][contributors-shield]][contributors-url]
@@ -57,17 +58,22 @@
 
 ```
 └─ Project
+  ├─ ContentTree.py
+  ├─ FileTree.py
+  ├─ Git.py
   ├─ LICENSE
+  ├─ Markdown.py
+  ├─ PicText.py
   ├─ README.md
+  ├─ README_cn.md
   ├─ README_Gen.py
+  ├─ README_Gen_cn.py
+  ├─ README_temple.py
   ├─ requirements.txt
   ├─ run.bat
-  ├─ temple_blank_cn.md
-  ├─ temple_blank_en.md
-  ├─ temple_cn.md
-  ├─ temple_en.md
-  ├─ /icons/
   └─ /images/
+    └─ logo.png
+
 ```
 
 

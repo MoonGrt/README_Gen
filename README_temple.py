@@ -2,7 +2,8 @@ from datetime import datetime
 import re
 
 class README_temple():
-    def __init__(self):
+    def __init__(self, language='en'):
+        self.language = language
         self.file_content = ""
         self.temple_content = ""
 
@@ -36,8 +37,16 @@ class README_temple():
                 with open(file, 'r', encoding='utf-8') as file:
                     self.file_content = file.read()
             except:
-                print("No README.md!")
-        temple = 'temple/temple_blank_en.md'
+                if self.language == 'en':
+                    print("No README.md!")
+                elif self.language == 'cn':
+                    print("No README_cn.md!")
+                
+
+        if self.language == 'en':
+            temple = 'temple/temple_blank_en.md'
+        elif self.language == 'cn':
+            temple = 'temple/temple_blank_cn.md'
         with open(temple, 'r', encoding='utf-8') as file:
             self.temple_content = file.read()
 
@@ -82,7 +91,10 @@ class README_temple():
     # 提取当前文件中 README 的 File Tree
     def extract_filetree(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r"<!-- FILE TREE -->\s*## File Tree\s*```(.*?)```"
+        if self.language == 'en':
+            pattern = r"<!-- FILE TREE -->\s*## File Tree\s*```(.*?)```"
+        elif self.language == 'cn':
+            pattern = r"<!-- 文件树 -->\s*## 文件树\s*```(.*?)```"
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -93,7 +105,10 @@ class README_temple():
     # 提取当前文件中 README 的 About The Project
     def extract_about(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'<!-- ABOUT THE PROJECT -->\s*## About The Project(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'<!-- ABOUT THE PROJECT -->\s*## About The Project(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'<!-- 关于本项目 -->\s*## 关于本项目(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -104,7 +119,10 @@ class README_temple():
     # 提取当前文件中 README 的 Built With
     def extract_build(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'### Built With(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'### Built With(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'### 构建工具(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -115,7 +133,10 @@ class README_temple():
     # 提取当前文件中 README 的 Getting Started
     def extract_start(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'<!-- GETTING STARTED -->\s*## Getting Started(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'<!-- GETTING STARTED -->\s*## Getting Started(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'<!-- 开始 -->\s*## 开始(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -126,7 +147,10 @@ class README_temple():
     # 提取当前文件中 README 的 Prerequisites
     def extract_prerequisites(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'### Prerequisites(.*?)### Installation'
+        if self.language == 'en':
+            pattern = r'### Prerequisites(.*?)### Installation'
+        elif self.language == 'cn':
+            pattern = r'### 依赖(.*?)### 安装'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -137,7 +161,10 @@ class README_temple():
     # 提取当前文件中 README 的 Installation
     def extract_installation(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'### Installation(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'### Installation(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'### 安装(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -148,7 +175,10 @@ class README_temple():
     # 提取当前文件中 README 的 Usage
     def extract_usage(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'<!-- USAGE EXAMPLES -->\s*## Usage(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'<!-- USAGE EXAMPLES -->\s*## Usage(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'<!-- 使用方法 -->\s*## 使用方法(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -159,7 +189,10 @@ class README_temple():
     # 提取当前文件中 README 的 Roadmap
     def extract_roadmap(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'<!-- ROADMAP -->\s*## Roadmap(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'<!-- ROADMAP -->\s*## Roadmap(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'<!-- 路线图 -->\s*## 路线图(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -170,7 +203,10 @@ class README_temple():
     # 提取当前文件中 README 的 Version
     def extract_version(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'<!-- VERSION -->\s*## Version(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'<!-- VERSION -->\s*## Version(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'<!-- 版本 -->\s*## 版本(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -181,7 +217,10 @@ class README_temple():
     # 提取当前文件中 README 的 Contributing
     def extract_contributing(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'<!-- CONTRIBUTING -->\s*## Contributing(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'<!-- CONTRIBUTING -->\s*## Contributing(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'<!-- 贡献 -->\s*## 贡献(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -192,7 +231,10 @@ class README_temple():
     # 提取当前文件中 README 的 Licence
     def extract_license(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'<!-- LICENSE -->\s*## License(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'<!-- LICENSE -->\s*## License(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'<!-- 许可证 -->\s*## 许可证(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -203,7 +245,10 @@ class README_temple():
     # 提取当前文件中 README 的 Contact
     def extract_contact(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'<!-- CONTACT -->\s*## Contact(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'<!-- CONTACT -->\s*## Contact(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'<!-- 联系我们 -->\s*## 联系我们(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -214,7 +259,10 @@ class README_temple():
     # 提取当前文件中 README 的 Acknowledgments
     def extract_acknowledgments(self):
         # 定义正则表达式模式，匹配整个文件树块（包括起始的 HTML 注释、标题和代码块）
-        pattern = r'<!-- ACKNOWLEDGMENTS -->\s*## Acknowledgments(.*?)<p align="right">'
+        if self.language == 'en':
+            pattern = r'<!-- ACKNOWLEDGMENTS -->\s*## Acknowledgments(.*?)<p align="right">'
+        elif self.language == 'cn':
+            pattern = r'<!-- 致谢 -->\s*## 致谢(.*?)<p align="right">'
         # 使用正则表达式进行匹配
         match = re.search(pattern, self.file_content, re.DOTALL)
         # 如果匹配成功，提取并返回整个文件树块
@@ -224,9 +272,11 @@ class README_temple():
 
 
 
+    def gen_chineselink(self):
+        return """**English | [简体中文](README_cn.md)**<br>"""
 
-
-
+    def gen_englishlink(self):
+        return """**简体中文 | [English](README.md)**<br>"""
 
     def gen_topid(self):
         return """<div id="top"></div>"""
@@ -427,17 +477,12 @@ SOFTWARE.
 """
 
     # 生成 README.md 的 Contact 部分
-#     def gen_Contact(self, username, repo_name, mail_address):
-#         return f"""
-# <!-- CONTACT -->
-# ## Contact
-# {username} - {mail_address}
-# Project Link: [{username}/{repo_name}](https://github.com/{username}/{repo_name})
-# <p align="right">(<a href="#top">top</a>)</p>
-
-# """
-    def gen_Contact(self):
-        return f"""{self.contact}"""
+    def gen_Contact(self, username, repo_name, mail_address):
+        return f"""{username} - {mail_address}
+Project Link: [{username}/{repo_name}](https://github.com/{username}/{repo_name})
+"""
+    # def gen_Contact(self):
+    #     return f"""{self.contact}"""
 
     # 生成 README.md 的 Acknowledgments 部分
     def gen_Acknowledgments(self):
@@ -467,9 +512,11 @@ SOFTWARE.
 
 
 if __name__ == '__main__':
-    README_content = README_temple()
+    # README_content = README_temple()
+    README_content = README_temple('cn')
     # README_content.extract_contents('temple/temple_blank_en.md')
-    README_content.extract_contents('README.md')
+    # README_content.extract_contents('README.md')
+    README_content.extract_contents('README_cn.md')
 
     print(README_content.pro_name + '\n')
     print(README_content.description + '\n')

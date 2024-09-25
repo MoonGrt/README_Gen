@@ -13,10 +13,10 @@ from PicText import PicText
 class App_window(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.content_tree = ContentTree()
-        self.file_tree = FileTree()
+        self.content_tree = ContentTree('目录')
+        self.file_tree = FileTree('文件树')
         self.Markdown = Markdown()
-        self.README_temple = README_temple()
+        self.README_temple = README_temple('cn')
         self.aboutgen_window = PicText()
 
         self.project_path = ''
@@ -27,7 +27,7 @@ class App_window(QMainWindow):
     def init_ui(self):
         # 设置主窗口属性
         self.resize(1000, 850)
-        self.setWindowTitle('README.md Generator')
+        self.setWindowTitle('README.md 生成软件')
         self.setWindowIcon(QIcon('images/icons/markdown.svg'))
 
         self.create_menu()
@@ -71,79 +71,79 @@ class App_window(QMainWindow):
     # 组件
     def add_sections(self):
         # 基本信息
-        self.username_label = QLabel('GitHub Username:')
+        self.username_label = QLabel('GitHub 用户名:')
         self.username_input = QLineEdit()
-        self.repo_label = QLabel('Repository Name:')
+        self.repo_label = QLabel('仓库名:')
         self.repo_input = QComboBox(self)
-        self.mail_label = QLabel('Mail address:')
+        self.mail_label = QLabel('邮箱:')
         self.mail_input = QLineEdit()
-        self.folder_path_label = QLabel('Folder Path:')
+        self.folder_path_label = QLabel('项目路径:')
         self.folder_path_input = QLineEdit()
-        self.browse_button = QPushButton('Browse', self)
+        self.browse_button = QPushButton('浏览', self)
         self.browse_button.clicked.connect(self.browse_folder)
         # Head 信息
-        self.title_label = QLabel('Project Title:')
+        self.title_label = QLabel('项目名称:')
         self.title_input = QLineEdit()
-        self.description_label = QLabel('Project Description:')
+        self.description_label = QLabel('项目简介:')
         self.description_input = QPlainTextEdit()
         self.description_input.setFixedHeight(80)  # 200
         # File tree 信息
-        self.markdown_filetree_label = QLabel('Fire Tree:')
+        self.markdown_filetree_label = QLabel('文件树:')
         self.filetree_input = QPlainTextEdit()
         self.filetree_input.setFixedHeight(200)
         # About The Project 信息
-        self.about_label = QLabel('About The Project:')
+        self.about_label = QLabel('关于本项目:')
         self.about_input = PicText()
         self.about_input.setFixedHeight(800)
         # Build with 信息
-        self.buildwith_label = QLabel('Build with:')
+        self.buildwith_label = QLabel('构建工具:')
         self.buildwith_input = QPlainTextEdit()
         self.buildwith_input.setFixedHeight(200)
         # Getting Started 信息
-        self.start_label = QLabel('Getting Started:')
+        self.start_label = QLabel('开始:')
         self.start_input = QPlainTextEdit()
         self.start_input.setFixedHeight(200)
         # Prerequisites 信息
-        self.prerequisites_label = QLabel('Prerequisites:')
+        self.prerequisites_label = QLabel('依赖:')
         self.prerequisites_input = QPlainTextEdit()
         self.prerequisites_input.setFixedHeight(200)
         # Installation 信息
-        self.installation_label = QLabel('Installation:')
+        self.installation_label = QLabel('安装:')
         self.installation_input = QPlainTextEdit()
         self.installation_input.setFixedHeight(200)
         # Usage 信息
-        self.usage_label = QLabel('Usage:')
+        self.usage_label = QLabel('使用方法:')
         self.usage_input = QPlainTextEdit()
         self.usage_input.setFixedHeight(200)
         # Roadmap 信息
-        self.roadmap_label = QLabel('Roadmap:')
+        self.roadmap_label = QLabel('路线图:')
         self.roadmap_input = QPlainTextEdit()
         self.roadmap_input.setFixedHeight(200)
         # Version 信息
-        self.version_label = QLabel('Version:')
+        self.version_label = QLabel('版本:')
         self.version_input = QPlainTextEdit()
         self.version_input.setFixedHeight(200)
         # Contributing 信息
-        self.contributing_label = QLabel('Contributing:')
+        self.contributing_label = QLabel('贡献:')
         self.contributing_input = QPlainTextEdit()
         self.contributing_input.setFixedHeight(200)
         # License 信息
-        self.license_label = QLabel('License:')
+        self.license_label = QLabel('许可证:')
         self.license_input = QPlainTextEdit()
         self.license_input.setFixedHeight(200)
-        self.MIT_date_label = QLabel('Date:')
+        self.MIT_date_label = QLabel('时间:')
         self.MIT_date_input = QLineEdit()
-        self.MIT_name_label = QLabel('Name:')
+        self.MIT_name_label = QLabel('名字:')
         self.MIT_name_input = QLineEdit()
         self.MIT_label = QLabel('MIT:')
         self.MIT_input = QPlainTextEdit()
         self.MIT_input.setFixedHeight(200)
         # Contact 信息
-        self.contact_label = QLabel('Contact:')
+        self.contact_label = QLabel('联系我们:')
         self.contact_input = QPlainTextEdit()
         self.contact_input.setFixedHeight(200)
         # Acknowledgements 信息
-        self.acknowledgements_label = QLabel('Acknowledgements:')
+        self.acknowledgements_label = QLabel('致谢:')
         self.acknowledgements_input = QPlainTextEdit()
         self.acknowledgements_input.setFixedHeight(200)
 
@@ -168,25 +168,24 @@ class App_window(QMainWindow):
         self.MIT_date_input.textChanged.connect(self.handle_MIT_name_change)
 
         # 生成、发送按钮
-        self.confirm_button = QPushButton('Gen', self)
+        self.confirm_button = QPushButton('生成', self)
         self.confirm_button.clicked.connect(self.GEN)
-        self.git_send_button = QPushButton('Git Send', self)
+        self.git_send_button = QPushButton('Git 发送', self)
         self.git_send_button.clicked.connect(self.git_send)
 
         # 内容目录
-        self.content_tree.add_items("README.md", [("Head", [], True),
-                                               ("Contents", [], True),
-                                               ("File Tree", [], True),
-                                            #    ("About The Project", ["Built With"]),
-                                               ("About The Project", ["Built With"], True),
-                                               ("Getting Started", ["Prerequisites", "Installation"]),
-                                               ("Usage", []),
-                                               ("Roadmap", []),
-                                               ("Version", []),
-                                               ("Contributing", [], True),
-                                               ("License", [], True),
-                                               ("Contact", [], True),
-                                               ("Acknowledgments", [], True)], True, True)  # parent child checked expanded
+        self.content_tree.add_items("README.md", [("头", [], True),
+                                               ("目录", [], True),
+                                               ("文件树", [], True),
+                                               ("关于本项目", ["构建工具"], True),
+                                               ("开始", ["依赖", "安装"]),
+                                               ("使用方法", []),
+                                               ("路线图", []),
+                                               ("版本", []),
+                                               ("贡献", [], True),
+                                               ("许可证", [], True),
+                                               ("联系我们", [], True),
+                                               ("致谢", [], True)], True, True)  # parent child checked expanded
         self.content_tree.add_items("requirements.txt")
         self.content_tree.add_items("run.bat")
         self.content_tree.itemChanged.connect(self.handle_contenttree_changed)
@@ -196,55 +195,55 @@ class App_window(QMainWindow):
 
     def create_menu(self):
         # 文件菜单
-        file_Menu = self.menuBar().addMenu('File')
+        file_Menu = self.menuBar().addMenu('文件')
 
-        insert_Action = QAction(QIcon('images/icons/insert.svg'), 'Open', self)  # 插入动作
+        insert_Action = QAction(QIcon('images/icons/insert.svg'), '插入', self)  # 插入动作
         insert_Action.setToolTip('Insert')
         insert_Action.triggered.connect(self.insert_file)
         file_Menu.addAction(insert_Action)
-        open_Action = QAction(QIcon('images/icons/open.svg'), 'Open', self)  # 打开动作
+        open_Action = QAction(QIcon('images/icons/open.svg'), '打开', self)  # 打开动作
         open_Action.setToolTip('Open')
         open_Action.triggered.connect(self.browse_folder)
         file_Menu.addAction(open_Action)
-        close_Action = QAction(QIcon('images/icons/close.svg'), 'Close', self)  # 关闭动作
+        close_Action = QAction(QIcon('images/icons/close.svg'), '关闭', self)  # 关闭动作
         close_Action.setToolTip('Close')
         close_Action.triggered.connect(self.close_folder)
         file_Menu.addAction(close_Action)
         file_Menu.addSeparator()  # 分隔线
-        save_Action = QAction(QIcon('images/icons/save.svg'), 'Save', self)  # 保存动作
+        save_Action = QAction(QIcon('images/icons/save.svg'), '保存', self)  # 保存动作
         save_Action.setToolTip('Save')
         save_Action.triggered.connect(self.GEN)
         file_Menu.addAction(save_Action)
-        exit_Action = QAction(QIcon('images/icons/exit.svg'), 'Exit', self)  # 退出动作
+        exit_Action = QAction(QIcon('images/icons/exit.svg'), '退出', self)  # 退出动作
         exit_Action.setToolTip('Exit')
         exit_Action.triggered.connect(self.close)
         file_Menu.addAction(exit_Action)
 
         # 编辑菜单
-        edit_Menu = self.menuBar().addMenu('Edit')
+        edit_Menu = self.menuBar().addMenu('编辑')
 
-        undo_Action = QAction(QIcon('images/icons/undo.svg'), 'Undo', self) # 撤销操作
+        undo_Action = QAction(QIcon('images/icons/undo.svg'), '撤销', self) # 撤销操作
         undo_Action.setToolTip('Undo')
         # undo_Action.triggered.connect(self.undo)
         edit_Menu.addAction(undo_Action)
-        redo_Action = QAction(QIcon('images/icons/redo.svg'), 'Redo', self) # 重做操作
+        redo_Action = QAction(QIcon('images/icons/redo.svg'), '重做', self) # 重做操作
         redo_Action.setToolTip('Redo')
         # redo_Action.triggered.connect(self.redo)
         edit_Menu.addAction(redo_Action)
         edit_Menu.addSeparator()  # 分隔线
-        cut_Action = QAction(QIcon('images/icons/cut.svg'), 'Cut', self) # 剪切操作
+        cut_Action = QAction(QIcon('images/icons/cut.svg'), '剪切', self) # 剪切操作
         cut_Action.setToolTip('Cut')
         # cut_Action.triggered.connect(self.cut)
         edit_Menu.addAction(cut_Action)
-        copy_Action = QAction(QIcon('images/icons/copy.svg'), 'Copy', self) # 复制操作
+        copy_Action = QAction(QIcon('images/icons/copy.svg'), '复制', self) # 复制操作
         copy_Action.setToolTip('Copy')
         # copy_Action.triggered.connect(self.copy)
         edit_Menu.addAction(copy_Action)
-        paste_Action = QAction(QIcon('images/icons/paste.svg'), 'Paste', self) # 粘贴操作
+        paste_Action = QAction(QIcon('images/icons/paste.svg'), '粘贴', self) # 粘贴操作
         paste_Action.setToolTip('Paste')
         # paste_Action.triggered.connect(self.paste)
         edit_Menu.addAction(paste_Action)
-        mode_Action = QAction(QIcon('images/icons/mode.svg'), 'Mode', self) # 模式操作
+        mode_Action = QAction(QIcon('images/icons/mode.svg'), '模式', self) # 模式操作
         mode_Action.setToolTip('Mode')
         mode_Action.triggered.connect(self.mode)
         edit_Menu.addAction(mode_Action)
@@ -373,7 +372,7 @@ class App_window(QMainWindow):
 
             self.file_tree.clear()
             self.file_tree.add_items(self.file_tree.root, folder_path)
-            self.README_temple.extract_contents(self.folder_path_input.text() + '/README.md')
+            self.README_temple.extract_contents(self.folder_path_input.text() + '/README_cn.md')
 
             # 向 GUI 填入文字
             if not self.README_temple.filetree:
@@ -406,7 +405,7 @@ class App_window(QMainWindow):
             self.acknowledgements_input.setPlainText(self.README_temple.acknowledgments)
 
     def insert_file(self):
-        image_path, _ = QFileDialog.getOpenFileName(self, 'Open Image File', '', 'Image files (*.jpg *.png *.bmp)')
+        image_path, _ = QFileDialog.getOpenFileName(self, '打开文件', '', '图片 (*.jpg *.png *.bmp)')
         if image_path:
             image = QImage(image_path)
             if image.isNull():
@@ -510,80 +509,80 @@ class App_window(QMainWindow):
             self.add_grid(self.folder_path_label, self.browse_button)
             self.add_grid(self.folder_path_input)
             self.add_grid()
-            # 是否开启 Head
-            if contents.get('Head'):
+            # 是否开启 头
+            if contents.get('头'):
                 self.add_grid(self.title_label, self.title_input)
                 self.add_grid(self.description_label)
                 self.add_grid(self.description_input)
                 self.add_grid()
-            # 是否开启 Contents
-            if contents.get('Contents'):
+            # 是否开启 目录
+            if contents.get('目录'):
                 pass
-            # 是否开启 Filetree
-            if contents.get('File Tree'):
+            # 是否开启 文件树
+            if contents.get('文件树'):
                 self.add_grid(self.markdown_filetree_label)
                 self.add_grid(self.filetree_input)
                 self.file_tree.setEnabled(True)
                 self.add_grid()
             else:
                 self.file_tree.setEnabled(False)
-            # 是否开启 About The Project
-            if contents.get('About The Project'):
+            # 是否开启 关于本项目
+            if contents.get('关于本项目'):
                 self.add_grid(self.about_label)
                 self.add_grid(self.about_input)
                 self.add_grid()
-                if contents.get('Built With'):
+                if contents.get('构建工具'):
                     self.add_grid(self.buildwith_label)
                     self.add_grid(self.buildwith_input)
                     self.add_grid()
-            # 是否开启 Getting Started
-            if contents.get('Getting Started'):
+            # 是否开启 开始
+            if contents.get('开始'):
                 self.add_grid(self.start_label)
                 self.add_grid(self.start_input)
                 self.add_grid()
-                if contents.get('Prerequisites'):
+                if contents.get('依赖'):
                     self.add_grid(self.prerequisites_label)
                     self.add_grid(self.prerequisites_input)
                     self.add_grid()
-                if contents.get('Installation'):
+                if contents.get('安装'):
                     self.add_grid(self.installation_label)
                     self.add_grid(self.installation_input)
                     self.add_grid()
-            # 是否开启 Usage
-            if contents.get('Usage'):
+            # 是否开启 使用方法
+            if contents.get('使用方法'):
                 self.add_grid(self.usage_label)
                 self.add_grid(self.usage_input)
                 self.add_grid()
-            # 是否开启 Roadmap
-            if contents.get('Roadmap'):
+            # 是否开启 路线图
+            if contents.get('路线图'):
                 self.add_grid(self.roadmap_label)
                 self.add_grid(self.roadmap_input)
                 self.add_grid()
-            # 是否开启 Version
-            if contents.get('Version'):
+            # 是否开启 版本
+            if contents.get('版本'):
                 self.add_grid(self.version_label)
                 self.add_grid(self.version_input)
                 self.add_grid()
-            # 是否开启 Contributing
-            if contents.get('Contributing'):
+            # 是否开启 贡献
+            if contents.get('贡献'):
                 self.add_grid(self.contributing_label)
                 self.add_grid(self.contributing_input)
                 self.add_grid()
-            # 是否开启 License
-            if contents.get('License'):
+            # 是否开启 许可证
+            if contents.get('许可证'):
                 self.add_grid(self.license_label)
                 self.add_grid(self.license_input)
                 self.add_grid(self.MIT_label)
                 self.add_grid(self.MIT_layout)
                 self.add_grid(self.MIT_input)
                 self.add_grid()
-            # 是否开启 Contact
-            if contents.get('Contact'):
+            # 是否开启 联系我们
+            if contents.get('联系我们'):
                 self.add_grid(self.contact_label)
                 self.add_grid(self.contact_input)
                 self.add_grid()
-            # 是否开启 Acknowledgments
-            if contents.get('Acknowledgments'):
+            # 是否开启 致谢
+            if contents.get('致谢'):
                 self.add_grid(self.acknowledgements_label)
                 self.add_grid(self.acknowledgements_input)
                 self.add_grid()
@@ -610,7 +609,7 @@ class App_window(QMainWindow):
         if self.project_path:
             self.copy_images()
             # 将 readme_content 内容保存到文件中
-            readme_path = self.project_path + '/README.md'
+            readme_path = self.project_path + '/README_cn.md'
             with open(readme_path, 'w', encoding='utf-8') as readme_file:
                 readme_file.write(self.Markdown.markdown)
             print(f"README.md generated successfully at {readme_path}")
@@ -643,14 +642,13 @@ class App_window(QMainWindow):
                 continue
             if is_checked:
                 # Add the section title with corresponding heading level
-                if title == "Head":
-                    markdown_text += self.README_temple.gen_chineselink() + '\n'
+                if title == "头":
+                    markdown_text += self.README_temple.gen_englishlink() + '\n'
                     markdown_text += self.README_temple.gen_topid() + '\n'
-                elif title == "Contents":
+                elif title == "目录":
                     pass
                 else:
                     markdown_text += f"<!-- {title.upper()} -->\n"
-                    # markdown_text += f"{'#' * level} {name}\n\n"
                     markdown_text += f"{'#' * (level+1)} {title}\n\n"
                 markdown_text += self.generate_sections(title) + '\n\n\n\n'
         link = self.README_temple.gen_Link(self.username_input.text(), self.repo_input.currentText())
@@ -658,50 +656,50 @@ class App_window(QMainWindow):
         return markdown_text + link
 
     def generate_sections(self, section):
-        # 生成 README.md 的 Head 部分
-        if section == 'Head':
+        # 生成 README.md 的 头 部分
+        if section == '头':
             title = self.title_input.text()
             description = self.description_input.toPlainText()
             return self.README_temple.gen_Head(self.username_input.text(), self.repo_input.currentText(), title, description)
         # 生成 README.md 的 Contents 部分
-        if section == 'Contents':
+        if section == '目录':
             return self.README_temple.gen_Contents(self.content_tree.get_items_state())
-        # 生成 README.md 的 File tree 部分
-        if section == 'File Tree':
+        # 生成 README.md 的 文件树 部分
+        if section == '文件树':
             return "```\n" + self.filetree_input.toPlainText() + "\n```"
-        # 生成 README.md 的 About The Project 部分
-        if section == 'About The Project':
+        # 生成 README.md 的 关于本项目 部分
+        if section == '关于本项目':
             return self.get_about() + '\n' + self.README_temple.gen_toplink()
-        if section == 'Built With':
+        if section == '构建工具':
             return self.buildwith_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
-        # 生成 README.md 的 Getting Started 部分
-        if section == 'Getting Started':
+        # 生成 README.md 的 开始 部分
+        if section == '开始':
             return self.start_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
-        if section == 'Prerequisites':
+        if section == '依赖':
             return self.prerequisites_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
-        if section == 'Installation':
+        if section == '安装':
             return self.installation_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
-        # 生成 README.md 的 Usage 部分
-        if section == 'Usage':
+        # 生成 README.md 的 使用方法 部分
+        if section == '使用方法':
             return self.usage_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
-        # 生成 README.md 的 Roadmap 部分
-        if section == 'Roadmap':
+        # 生成 README.md 的 路线图 部分
+        if section == '路线图':
             return self.roadmap_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
-        # 生成 README.md 的 Version 部分
-        if section == 'Version':
+        # 生成 README.md 的 版本 部分
+        if section == '版本':
             return self.version_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
-        # 生成 README.md 的 Contributing 部分
-        if section == 'Contributing':
+        # 生成 README.md 的 贡献 部分
+        if section == '贡献':
             return self.contributing_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
-        # 生成 README.md 的 License 部分
-        if section == 'License':
+        # 生成 README.md 的 许可证 部分
+        if section == '许可证':
             self.generate_license()
             return self.license_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
-        # 生成 README.md 的 Contact 部分
-        if section == 'Contact':
+        # 生成 README.md 的 联系我们 部分
+        if section == '联系我们':
             return self.contact_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
-        # 生成 README.md 的 Acknowledgments 部分
-        if section == 'Acknowledgments':
+        # 生成 README.md 的 致谢 部分
+        if section == '致谢':
             return self.acknowledgements_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
 
     def get_about(self):

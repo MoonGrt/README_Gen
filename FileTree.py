@@ -2,10 +2,10 @@ import sys, os
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTreeWidget, QTreeWidgetItem
 
 class FileTree(QTreeWidget):
-    def __init__(self):
+    def __init__(self, name='File Tree'):
         super().__init__()
         self.setColumnCount(1)
-        self.setHeaderLabels(["File Tree"])
+        self.setHeaderLabels([name])
         self.root = self.invisibleRootItem()
         self.file_paths = []
         self.file_info = []
@@ -186,6 +186,11 @@ class FileTree(QTreeWidget):
                     child_item.setDisabled(False)  # 如果母选项选中，则开启子选项的选择功能
                     # if child_item.text(0) != '.git':
                     #     child_item.setCheckState(0, 2)
+
+    def clear_tree(self):
+        self.clear()  # Clears all items from the QTreeWidget
+        self.file_paths.clear()  # Optionally clear the stored file paths
+        self.file_info.clear()  # Optionally clear any stored file info
 
 
 if __name__ == '__main__':

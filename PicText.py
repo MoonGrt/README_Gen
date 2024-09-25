@@ -1,4 +1,4 @@
-import sys, os
+import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QAction, QFileDialog, QVBoxLayout, QPushButton, QWidget
 from PyQt5.QtGui import QIcon, QImage, QTextCursor, QTextBlockFormat
 from PyQt5.QtCore import Qt
@@ -115,7 +115,6 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         layout.addWidget(self.text_edit)
         layout.addWidget(self.gen_button)
-
         container = QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)

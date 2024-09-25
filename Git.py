@@ -221,6 +221,7 @@ class App_window(QWidget):
 
         print(f"Changes pushed to {current_branch} on GitHub.")
 
+
 # 生成 MIT licsense
 def gen_MIT(year=datetime.now().year, author_name='MoonGrt'):
     return f"""MIT License

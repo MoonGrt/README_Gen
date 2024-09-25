@@ -62,6 +62,14 @@
 
 
 
+<!-- 文件树 -->
+## 文件树
+
+```
+
+```
+
+
 <!-- 关于本项目 -->
 ## 关于本项目
 
@@ -124,7 +132,7 @@ _下面是一个指导你的受众如何安装和配置你的应用的例子。�
 
 
 
-<!-- 使用方法 示例 -->
+<!-- 使用方法 -->
 ## 使用方法
 
 在这里你可以展示项目的使用方法。把附加的截图、代码示例和演示放在这里也很不错。你也可以用链接引用其他资源。
@@ -146,6 +154,15 @@ _转到 [文档](https://example.com) 查看更多示例_
 到 [open issues](https://github.com/github_username/repo_name/issues) 页查看所有请求的功能 （以及已知的问题）。
 
 <p align="right">(<a href="#top">回到顶部</a>)</p>
+
+
+
+<!-- 版本 -->
+## 版本
+
+
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 
 
@@ -189,9 +206,16 @@ _转到 [文档](https://example.com) 查看更多示例_
 <!-- 致谢 -->
 ## 致谢
 
-* []()
-* []()
-* []()
+在这里列出你觉得有用的资源，并以此致谢。我已经添加了一些我喜欢的资源，以便你可以快速开始！
+
+* [Choose an Open Source License](https://choosealicense.com)
+* [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
+* [Malven's Flexbox Cheatsheet](https://flexbox.malven.co/)
+* [Malven's Grid Cheatsheet](https://grid.malven.co/)
+* [Img Shields](https://shields.io)
+* [GitHub Pages](https://pages.github.com)
+* [Font Awesome](https://fontawesome.com)
+* [React Icons](https://react-icons.github.io/react-icons/search)
 
 <p align="right">(<a href="#top">回到顶部</a>)</p>
 

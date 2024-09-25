@@ -2,10 +2,10 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTreeWidget, QTreeWidgetItem
 
 class ContentTree(QTreeWidget):
-    def __init__(self):
+    def __init__(self, name='Content'):
         super().__init__()
         self.setColumnCount(1)
-        self.setHeaderLabels(["Content"])
+        self.setHeaderLabels([name])
         self.root = self.invisibleRootItem()
 
     # 将内容项添加到内容树中，支持多级嵌套，新增展开参数
