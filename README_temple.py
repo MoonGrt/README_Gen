@@ -37,7 +37,7 @@ class README_temple():
                     self.file_content = file.read()
             except:
                 print("No README.md!")
-        temple = 'temple_blank_en.md'
+        temple = 'temple/temple_blank_en.md'
         with open(temple, 'r', encoding='utf-8') as file:
             self.temple_content = file.read()
 
@@ -468,21 +468,21 @@ SOFTWARE.
 
 if __name__ == '__main__':
     README_content = README_temple()
-    README_content.extract_contents('temple_blank_en.md')
-    # README_content.extract_contents('README.md')
+    # README_content.extract_contents('temple/temple_blank_en.md')
+    README_content.extract_contents('README.md')
 
-    # print(README_content.pro_name + '\n')
-    # print(README_content.description + '\n')
-    # print(README_content.filetree + '\n')
-    # print(README_content.about + '\n')
-    # print(README_content.build + '\n')
-    # print(README_content.start + '\n')
-    # print(README_content.prerequisites + '\n')
-    # print(README_content.installation + '\n')
-    # print(README_content.usage + '\n')
-    # print(README_content.roadmap + '\n')
-    # print(README_content.version + '\n')
-    # print(README_content.contributing + '\n')
-    # print(README_content.license + '\n')
-    # print(README_content.contact + '\n')
-    # print(README_content.acknowledgments + '\n')
+    print(README_content.pro_name + '\n')
+    print(README_content.description + '\n')
+    print(README_content.filetree + '\n')
+    print(README_content.about + '\n')
+    print(README_content.build + '\n')
+    print(README_content.start + '\n')
+    print(README_content.prerequisites + '\n')
+    print(README_content.installation + '\n')
+    print(README_content.usage + '\n')
+    print(README_content.roadmap + '\n')
+    print(README_content.version + '\n')
+    print(README_content.contributing + '\n')
+    print(README_content.license + '\n')
+    print(README_content.contact + '\n')
+    print(README_content.acknowledgments + '\n')

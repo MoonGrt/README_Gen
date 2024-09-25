@@ -1,6 +1,6 @@
 import sys, os, subprocess, requests, shutil
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QPlainTextEdit, QFrame, QGridLayout, QComboBox
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QFileDialog, QScrollArea, QSizePolicy, QTextEdit, QMessageBox
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QFileDialog, QScrollArea, QSizePolicy, QMessageBox, QMainWindow, QAction
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from datetime import datetime
@@ -10,7 +10,7 @@ from ContentTree import ContentTree
 from README_temple import README_temple
 from PicText import PicText
 
-class App_window(QWidget):
+class App_window(QMainWindow):
     def __init__(self):
         super().__init__()
         self.Markdown = Markdown()
@@ -24,11 +24,48 @@ class App_window(QWidget):
 
     def init_ui(self):
         # 设置主窗口属性
-        self.resize(1100, 800)
+        self.resize(1000, 850)
         self.setWindowTitle('README.md Generator')
         self.setWindowIcon(QIcon('images/icons/markdown.svg'))
 
+        self.create_menu()
+        self.add_sections()
 
+        # 左侧布局
+        left_layout = QVBoxLayout()
+        left_layout.addWidget(self.content_tree)
+        left_layout.addWidget(self.file_tree)
+
+        # 右侧布局
+        self.grid_layout = QGridLayout(self)  # warning: QLayout: Attempting to add QLayout "" to App_window "", which already has a layout
+        self.update_form_layout(self.content_tree.get_items_state())
+        self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.set_gridcolwidth_ratios([1, 2])
+
+        scroll_area = QScrollArea()
+        scroll_widget = QWidget()
+        scroll_widget.setLayout(self.grid_layout)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(scroll_widget)
+
+        bottom_layout = QHBoxLayout()
+        bottom_layout.addWidget(self.confirm_button)
+        bottom_layout.addWidget(self.git_send_button)
+
+        right_layout = QVBoxLayout()
+        right_layout.addWidget(scroll_area)
+        right_layout.addLayout(bottom_layout)
+
+
+        # 总体布局 左右
+        central_widget = QWidget()  # 创建一个中央部件
+        layout = QHBoxLayout(central_widget)
+        layout.addLayout(left_layout, 1)
+        layout.addLayout(right_layout, 3)
+        self.setCentralWidget(central_widget)  # 使用 setCentralWidget 而不是 setLayout
+
+    # 组件
+    def add_sections(self):
         # 基本信息
         self.username_label = QLabel('GitHub Username:')
         self.username_input = QLineEdit()
@@ -52,10 +89,10 @@ class App_window(QWidget):
         self.filetree_input.setFixedHeight(200)
         # About The Project 信息
         self.about_label = QLabel('About The Project:')
-        self.about_input = QTextEdit()
-        self.about_input.setFixedHeight(400)
-        self.aboutgen_button = QPushButton('About Gen', self)
-        self.aboutgen_button.clicked.connect(self.about_gen)
+        self.about_input = PicText()
+        self.about_input.setFixedHeight(800)
+        # self.aboutgen_button = QPushButton('About Gen', self)
+        # self.aboutgen_button.clicked.connect(self.about_gen)
         # Build with 信息
         self.buildwith_label = QLabel('Build with:')
         self.buildwith_input = QPlainTextEdit()
@@ -121,12 +158,7 @@ class App_window(QWidget):
         self.MIT_layout.addWidget(self.MIT_name_label, 1)
         self.MIT_layout.addWidget(self.MIT_name_input, 2)
 
-        # repo_input 信息填充
-        # 获取用户仓库列表
-        repositories = self.get_repoinfo()
-        if repositories:
-            for repo in repositories:
-                self.repo_input.addItem(repo["name"])
+        # self.get_repoinfo()
 
         # 信息链接
         self.username_input.textChanged.connect(self.handle_username_change)
@@ -164,38 +196,67 @@ class App_window(QWidget):
         self.file_tree = FileTree()
         self.file_tree.itemChanged.connect(self.handle_filetree_changed)
 
+    def create_menu(self):
+        # 文件菜单
+        file_Menu = self.menuBar().addMenu('File')
 
-        # 左侧布局
-        left_layout = QVBoxLayout()
-        left_layout.addWidget(self.content_tree)
-        left_layout.addWidget(self.file_tree)
+        open_Action = QAction(QIcon('images/icons/open.svg'), 'Open', self)  # 打开动作
+        open_Action.setToolTip('Open')
+        open_Action.triggered.connect(self.browse_folder)
+        file_Menu.addAction(open_Action)
+        close_Action = QAction(QIcon('images/icons/close.svg'), 'Close', self)  # 关闭动作
+        close_Action.setToolTip('Close')
+        close_Action.triggered.connect(self.close_folder)
+        file_Menu.addAction(close_Action)
+        file_Menu.addSeparator()  # 分隔线
+        save_Action = QAction(QIcon('images/icons/save.svg'), 'Save', self)  # 保存动作
+        save_Action.setToolTip('Save')
+        save_Action.triggered.connect(self.GEN)
+        file_Menu.addAction(save_Action)
+        exit_Action = QAction(QIcon('images/icons/exit.svg'), 'Exit', self)  # 退出动作
+        exit_Action.setToolTip('Exit')
+        exit_Action.triggered.connect(self.close)
+        file_Menu.addAction(exit_Action)
 
-        # 右侧布局
-        self.grid_layout = QGridLayout(self)
-        self.update_form_layout(self.content_tree.get_items_state())
-        self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.set_gridcolwidth_ratios([1, 2])
+        # 编辑菜单
+        edit_Menu = self.menuBar().addMenu('Edit')
 
-        scroll_area = QScrollArea()
-        scroll_widget = QWidget()
-        scroll_widget.setLayout(self.grid_layout)
-        scroll_area.setWidgetResizable(True)
-        scroll_area.setWidget(scroll_widget)
+        undo_Action = QAction(QIcon('images/icons/undo.svg'), 'Undo', self) # 撤销操作
+        undo_Action.setToolTip('Undo')
+        # undo_Action.triggered.connect(self.undo)
+        edit_Menu.addAction(undo_Action)
+        redo_Action = QAction(QIcon('images/icons/redo.svg'), 'Redo', self) # 重做操作
+        redo_Action.setToolTip('Redo')
+        # redo_Action.triggered.connect(self.redo)
+        edit_Menu.addAction(redo_Action)
+        edit_Menu.addSeparator()  # 分隔线
+        cut_Action = QAction(QIcon('images/icons/cut.svg'), 'Cut', self) # 剪切操作
+        cut_Action.setToolTip('Cut')
+        # cut_Action.triggered.connect(self.cut)
+        edit_Menu.addAction(cut_Action)
+        copy_Action = QAction(QIcon('images/icons/copy.svg'), 'Copy', self) # 复制操作
+        copy_Action.setToolTip('Copy')
+        # copy_Action.triggered.connect(self.copy)
+        edit_Menu.addAction(copy_Action)
+        paste_Action = QAction(QIcon('images/icons/paste.svg'), 'Paste', self) # 粘贴操作
+        paste_Action.setToolTip('Paste')
+        # paste_Action.triggered.connect(self.paste)
+        edit_Menu.addAction(paste_Action)
 
-        bottom_layout = QHBoxLayout()
-        bottom_layout.addWidget(self.confirm_button)
-        bottom_layout.addWidget(self.git_send_button)
-
-        right_layout = QVBoxLayout()
-        right_layout.addWidget(scroll_area)
-        right_layout.addLayout(bottom_layout)
 
 
-        # 总体布局 左右
-        layout = QHBoxLayout()
-        layout.addLayout(left_layout, 1)
-        layout.addLayout(right_layout, 3)
-        self.setLayout(layout)
+        # 工具栏
+        toolbar1 = self.addToolBar('Toolbar1')
+        toolbar1.addAction(open_Action)
+        toolbar1.addAction(close_Action)
+        toolbar1.addAction(save_Action)
+
+        toolbar2 = self.addToolBar('Toolbar2')
+        toolbar2.addAction(undo_Action)
+        toolbar2.addAction(redo_Action)
+        toolbar2.addAction(cut_Action)
+        toolbar2.addAction(copy_Action)
+        toolbar2.addAction(paste_Action)
 
 
     # 添加组件到 grid_layout
@@ -290,10 +351,13 @@ class App_window(QWidget):
 
         if response.status_code == 200:
             repositories = response.json()
-            return repositories
+            # repo_input 信息填充
+            # 获取用户仓库列表
+            if repositories:
+                for repo in repositories:
+                    self.repo_input.addItem(repo["name"])
         else:
             print(f"Error: Unable to fetch repositories. Status code: {response.status_code}")
-            return None
 
     # 浏览文件夹
     def browse_folder(self):
@@ -336,18 +400,8 @@ class App_window(QWidget):
             self.contact_input.setPlainText(self.README_temple.contact)
             self.acknowledgements_input.setPlainText(self.README_temple.acknowledgments)
 
-    # 生成 about
-    def about_gen(self):
-        # 点击按钮后创建并显示文本编辑器窗口
-        self.aboutgen_window.gen_button.clicked.connect(self.set_about)
-        self.aboutgen_window.show()
-
-    def set_about(self, event):
-        about_text = self.aboutgen_window.get_text()
-        about_text = about_text.replace(self.project_path + '/', '')
-        self.about_input.setPlainText(about_text)
-
-        self.aboutgen_window.close()
+    def close_folder(self):
+        pass
 
     # 发送到github仓库
     def git_send(self):
@@ -438,7 +492,8 @@ class App_window(QWidget):
                 self.file_tree.setEnabled(False)
             # 是否开启 About The Project
             if contents.get('About The Project'):
-                self.add_grid(self.about_label, self.aboutgen_button)
+                self.add_grid(self.about_label)
+                # self.add_grid(self.about_label, self.aboutgen_button)
                 self.add_grid(self.about_input)
                 self.add_grid()
                 if contents.get('Built With'):
@@ -579,7 +634,7 @@ class App_window(QWidget):
             return "```\n" + self.filetree_input.toPlainText() + "\n```"
         # 生成 README.md 的 About The Project 部分
         if section == 'About The Project':
-            return self.about_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
+            return self.get_about() + '\n' + self.README_temple.gen_toplink()
         if section == 'Built With':
             return self.buildwith_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 Getting Started 部分
@@ -611,6 +666,13 @@ class App_window(QWidget):
         # 生成 README.md 的 Acknowledgments 部分
         if section == 'Acknowledgments':
             return self.acknowledgements_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
+
+    def get_about(self):
+        about_html = self.about_input.toHtml()
+        about_html = about_html.replace(self.project_path + '/', '')
+        about_html = about_html.splitlines()  # 将字符串按行分割成列表
+        about_html = '\n'.join(about_html[4:])  # 跳过前四行
+        return about_html
 
     def generate_license(self):
         if self.project_path:
@@ -644,8 +706,6 @@ if __name__ == '__main__':
     window = App_window()
     window.show()
     sys.exit(app.exec_())
-
-
 
 
 # TODO: 添加对git异常的处理：fatal: detected dubious ownership in repository at 'U:/xxx'

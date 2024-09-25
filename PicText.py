@@ -1,52 +1,78 @@
 import sys, os, html2text, markdown, re
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QAction, QFileDialog, QVBoxLayout, QPushButton, QWidget
 from PyQt5.QtGui import QIcon, QImage, QTextCursor, QTextBlockFormat
-from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtCore import Qt
 
-class ImageTextEdit(QTextEdit):
+class PicText(QTextEdit):
     def __init__(self, parent=None):
         super().__init__(parent)
         # 禁用拖放功能
-        self.setAcceptDrops(False)
+        # self.setAcceptDrops(False)
         # 启用拖放功能
-        # self.setAcceptDrops(True)
+        self.setAcceptDrops(True)
 
-
+    # 重写 dragEnterEvent 方法，检查是否是文件或文本拖入
     def dragEnterEvent(self, event):
-        # 检查是否拖入的是文件，且文件为图片格式
-        if event.mimeData().hasUrls():
-            urls = event.mimeData().urls()
-            if all(url.isLocalFile() and os.path.splitext(url.toLocalFile())[1].lower() in ('.jpg', '.png', '.bmp') for url in urls):
-                event.acceptProposedAction()
+        if event.mimeData().hasUrls() or event.mimeData().hasText():
+            event.acceptProposedAction()  # 接受拖动事件
         else:
-            super().dragEnterEvent(event)
+            event.ignore()
 
+    # 重写 dropEvent 方法，处理拖放的文件或文本
     def dropEvent(self, event):
-        # 当文件放下时，插入图片
-        if event.mimeData().hasUrls():
+        self.setReadOnly(True)  # 防止 调用父类的 dropEvent 方法 时，写入内容
+        super().dropEvent(event)  # 调用父类的 dropEvent 方法，以确保光标能够正确更新
+        self.setReadOnly(False)  
+
+        if event.mimeData().hasUrls():  # 如果拖入的是文件
             urls = event.mimeData().urls()
             for url in urls:
-                image_path = url.toLocalFile()
-                image = QImage(image_path)
-                
-                if image.isNull():
-                    continue  # 无法加载图像时跳过
-
-                # 获取光标并插入图片
-                cursor = self.textCursor()
-                # 设置段落居中
-                block_format = QTextBlockFormat()
-                block_format.setAlignment(Qt.AlignCenter)
-                cursor.insertBlock(block_format)
-                # 插入图片
-                cursor.insertImage(image, image_path)
-            
+                file_path = url.toLocalFile()  # 获取本地文件路径
+                if file_path.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif')):
+                    # 如果是图片文件
+                    self.insert_image(file_path)
+                else:
+                    # 如果是文本文件
+                    try:
+                        with open(file_path, 'r') as file:
+                            content = file.read()  # 读取文件内容
+                            self.append(content)  # 插入到 QTextEdit
+                    except Exception as e:
+                        print(f"Error reading file {file_path}: {e}")
+            event.acceptProposedAction()
+        elif event.mimeData().hasText():  # 如果拖入的是纯文本
+            text = event.mimeData().text()
+            self.append(text)  # 插入到 QTextEdit
             event.acceptProposedAction()
         else:
-            super().dropEvent(event)
+            event.ignore()
+
+    # 插入居中图片到 QTextEdit 中
+    def insert_image(self, image_path):
+        image = QImage(image_path)
+        if not image.isNull():
+            cursor = self.textCursor()
+
+            # 设置块格式为居中
+            block_format = QTextBlockFormat()
+            block_format.setAlignment(Qt.AlignCenter)
+            # 插入图片
+            cursor.insertBlock(block_format)  # 插入一个新块并应用居中格式
+            cursor.insertImage(image, image_path)
+
+            # 移动光标到插入块的后面
+            cursor.insertBlock()  # 插入一个新块以结束当前块
+            cursor.movePosition(QTextCursor.StartOfBlock)  # 将光标移动到新块的开始
+            # 清除居中对齐，使新段落恢复默认的左对齐
+            block_format.setAlignment(Qt.AlignLeft)
+            cursor.setBlockFormat(block_format)
+            # 更新文本编辑器的光标
+            self.setTextCursor(cursor)
+        else:
+            print(f"Failed to load image {image_path}")
 
 
-class PicText(QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
@@ -60,16 +86,18 @@ class PicText(QMainWindow):
         file_menu = menubar.addMenu('File')
 
         # 添加插入图片选项
-        insert_image_action = QAction(QIcon(), 'Insert Image', self)
+        insert_image_action = QAction(QIcon(), 'Insert', self)
         insert_image_action.triggered.connect(self.insert_image)
         file_menu.addAction(insert_image_action)
 
-        # 使用自定义的 ImageTextEdit 作为文本编辑器
-        self.text_edit = ImageTextEdit(self)
+        toolbar = self.addToolBar('Toolbar')
+        toolbar.addAction(insert_image_action)
+
+        # 使用自定义的 PicText 作为文本编辑器
+        self.text_edit = PicText(self)
 
         # 添加提交按钮
         self.gen_button = QPushButton("Gen", self)
-        # self.gen_button.clicked.connect(self.test)
 
         # 添加按钮布局
         layout = QVBoxLayout()
@@ -110,43 +138,24 @@ class PicText(QMainWindow):
                 self.text_edit.setTextCursor(cursor)
 
     def get_text(self):
-        html = self.text_edit.toHtml()
-        markdown_content = html2text.html2text(html)
-        return markdown_content
+        return self.text_edit.toHtml()
+
+    def set_text(self, text):
+        self.text_edit.setHtml(text)
 
     def test(self):
         html = self.text_edit.toHtml()
-        markdown_content = html2text.html2text(html)
-        html_content = markdown.markdown(markdown_content)
+        html = html.replace("F:/Project/Python/Project/README_Gen/" + '/', '')
+        html = html.splitlines()  # 将字符串按行分割成列表
+        html = '\n'.join(html[4:])  # 跳过前四行
+        print('-----------------------------------------------------------------')
         print(html)
-        print('-----------------------------------------------------------------')
-        print(markdown_content)
-        # markdown_content = self.center_images_in_markdown(markdown_content)
-        # print(markdown_content)
-        print('-----------------------------------------------------------------')
-        print(html_content)
-        self.text_edit.setHtml(html_content)
 
-    def center_images_in_markdown(self, markdown_text):
-        # 定义正则表达式，匹配 Markdown 图片格式 ![alt text](image_url)
-        img_pattern = r'!\[([^\]]*)\]\(([^)]+)\)'
-        
-        # 替换为居中的 HTML 格式
-        def replace_with_centered_html(match):
-            alt_text = match.group(1)
-            img_url = match.group(2)
-            # 用HTML div 和 img标签将图片居中
-            return f'<div style="text-align:center;"><img src="{img_url}" alt="{alt_text}" /></div>'
-        
-        # 使用正则表达式进行替换
-        centered_markdown = re.sub(img_pattern, replace_with_centered_html, markdown_text)
-        
-        return centered_markdown
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    editor = PicText()
+    editor = MainWindow()
     editor.show()
-    # editor.closeEvent = editor.get_text
+    editor.gen_button.clicked.connect(editor.test)
     sys.exit(app.exec_())
