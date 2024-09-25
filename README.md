@@ -16,7 +16,7 @@
     </a>
 <h3 align="center">README_Gen</h3>
     <p align="center">
-    Discover README_generator, the ultimate solution for crafting polished GitHub README.md files effortlessly. Tailor your project documentation with ease, including customizable details, badges, and layouts. Accelerate your workflow with one-click generation and direct GitHub integration. Boost your GitHub presence by effortlessly creating professional project pages.
+    Discover README_Gen, the ultimate solution for crafting polished GitHub README.md files effortlessly. Tailor your project documentation with ease, including customizable details, badges, and layouts. Accelerate your workflow with one-click generation and direct GitHub integration. Boost your GitHub presence by effortlessly creating professional project pages.
     <br />
     <a href="https://github.com/MoonGrt/README_Gen"><strong>Explore the docs »</strong></a>
     <br />
