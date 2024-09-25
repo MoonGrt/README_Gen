@@ -14,7 +14,7 @@
     <a href="https://github.com/MoonGrt/">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
     </a>
-<h3 align="center">项目标题</h3>
+<h3 align="center">README_Gen</h3>
     <p align="center">
     了解 README_generator，它是轻松制作精美 GitHub README.md 文件的终极解决方案。轻松定制项目文档，包括可定制的细节、徽章和布局。一键生成并直接集成 GitHub，加快工作流程。轻松创建专业的项目页面，提升你在 GitHub 上的影响力。
     <br />
@@ -64,7 +64,6 @@
   ├─ run_cn.bat
   ├─ /images/
   └─ /temple/
-
 ```
 
 
