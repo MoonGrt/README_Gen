@@ -30,6 +30,7 @@ class App_window(QMainWindow):
 
         self.create_menu()
         self.add_sections()
+        self.get_repoinfo()
 
         # 左侧布局
         left_layout = QVBoxLayout()
@@ -158,8 +159,6 @@ class App_window(QMainWindow):
         self.MIT_layout.addWidget(self.MIT_name_label, 1)
         self.MIT_layout.addWidget(self.MIT_name_input, 2)
 
-        # self.get_repoinfo()
-
         # 信息链接
         self.username_input.textChanged.connect(self.handle_username_change)
         self.repo_input.currentIndexChanged.connect(self.handle_repo_change)
@@ -244,7 +243,6 @@ class App_window(QMainWindow):
         edit_Menu.addAction(paste_Action)
 
 
-
         # 工具栏
         toolbar1 = self.addToolBar('Toolbar1')
         toolbar1.addAction(open_Action)
@@ -257,7 +255,6 @@ class App_window(QMainWindow):
         toolbar2.addAction(cut_Action)
         toolbar2.addAction(copy_Action)
         toolbar2.addAction(paste_Action)
-
 
     # 添加组件到 grid_layout
     def add_grid(self, *widgets):
@@ -386,7 +383,7 @@ class App_window(QMainWindow):
             self.description_input.setPlainText(self.README_temple.description)
 
             self.filetree_input.setPlainText(self.README_temple.filetree)
-            self.about_input.setPlainText(self.README_temple.about)
+            self.about_input.setHtml(self.README_temple.about)
             self.buildwith_input.setPlainText(self.README_temple.build)
             self.start_input.setPlainText(self.README_temple.start)
             self.prerequisites_input.setPlainText(self.README_temple.prerequisites)

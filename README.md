@@ -10,21 +10,21 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-    <a href="https://github.com/MoonGrt/">
+    <a href="https://github.com/MoonGrt/README_Gen">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
     </a>
 <h3 align="center">README_Gen</h3>
     <p align="center">
     Discover README_generator, the ultimate solution for crafting polished GitHub README.md files effortlessly. Tailor your project documentation with ease, including customizable details, badges, and layouts. Accelerate your workflow with one-click generation and direct GitHub integration. Boost your GitHub presence by effortlessly creating professional project pages.
     <br />
-    <a href="https://github.com/MoonGrt/"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/MoonGrt/README_Gen"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/MoonGrt/">View Demo</a>
+    <a href="https://github.com/MoonGrt/README_Gen">View Demo</a>
     ·
-    <a href="https://github.com/MoonGrt//issues">Report Bug</a>
+    <a href="https://github.com/MoonGrt/README_Gen/issues">Report Bug</a>
     ·
-    <a href="https://github.com/MoonGrt//issues">Request Feature</a>
+    <a href="https://github.com/MoonGrt/README_Gen/issues">Request Feature</a>
     </p>
 </div>
 
@@ -76,7 +76,7 @@
 ## About The Project
 
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Discover README_generator, the ultimate solution for crafting polished GitHub README.md files effortlessly. Tailor your project documentation with ease, including customizable details, badges, and layouts. Accelerate your workflow with one-click generation and direct GitHub integration. Boost your GitHub presence by effortlessly creating professional project pages.</p>
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/README_Gen.png" /></p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/README_Gen.png" height="400" /></p>
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>
 <p align="right">(<a href="#top">top</a>)</p>
 
@@ -132,14 +132,14 @@ Project Link: [MoonGrt](https://github.com/MoonGrt/)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/MoonGrt/.svg?style=for-the-badge
-[contributors-url]: https://github.com/MoonGrt//graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/MoonGrt/.svg?style=for-the-badge
-[forks-url]: https://github.com/MoonGrt//network/members
-[stars-shield]: https://img.shields.io/github/stars/MoonGrt/.svg?style=for-the-badge
-[stars-url]: https://github.com/MoonGrt//stargazers
-[issues-shield]: https://img.shields.io/github/issues/MoonGrt/.svg?style=for-the-badge
-[issues-url]: https://github.com/MoonGrt//issues
-[license-shield]: https://img.shields.io/github/license/MoonGrt/.svg?style=for-the-badge
-[license-url]: https://github.com/MoonGrt//blob/master/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/MoonGrt/README_Gen.svg?style=for-the-badge
+[contributors-url]: https://github.com/MoonGrt/README_Gen/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/MoonGrt/README_Gen.svg?style=for-the-badge
+[forks-url]: https://github.com/MoonGrt/README_Gen/network/members
+[stars-shield]: https://img.shields.io/github/stars/MoonGrt/README_Gen.svg?style=for-the-badge
+[stars-url]: https://github.com/MoonGrt/README_Gen/stargazers
+[issues-shield]: https://img.shields.io/github/issues/MoonGrt/README_Gen.svg?style=for-the-badge
+[issues-url]: https://github.com/MoonGrt/README_Gen/issues
+[license-shield]: https://img.shields.io/github/license/MoonGrt/README_Gen.svg?style=for-the-badge
+[license-url]: https://github.com/MoonGrt/README_Gen/blob/master/LICENSE
 

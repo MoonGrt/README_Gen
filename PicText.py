@@ -1,4 +1,4 @@
-import sys, os, html2text, markdown, re
+import sys, os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QAction, QFileDialog, QVBoxLayout, QPushButton, QWidget
 from PyQt5.QtGui import QIcon, QImage, QTextCursor, QTextBlockFormat
 from PyQt5.QtCore import Qt
@@ -10,6 +10,7 @@ class PicText(QTextEdit):
         # self.setAcceptDrops(False)
         # 启用拖放功能
         self.setAcceptDrops(True)
+        self.max_height = 400  # 设置图片最大高度
 
     # 重写 dragEnterEvent 方法，检查是否是文件或文本拖入
     def dragEnterEvent(self, event):
@@ -22,7 +23,7 @@ class PicText(QTextEdit):
     def dropEvent(self, event):
         self.setReadOnly(True)  # 防止 调用父类的 dropEvent 方法 时，写入内容
         super().dropEvent(event)  # 调用父类的 dropEvent 方法，以确保光标能够正确更新
-        self.setReadOnly(False)  
+        self.setReadOnly(False)
 
         if event.mimeData().hasUrls():  # 如果拖入的是文件
             urls = event.mimeData().urls()
@@ -51,6 +52,12 @@ class PicText(QTextEdit):
     def insert_image(self, image_path):
         image = QImage(image_path)
         if not image.isNull():
+            image_height = image.height()
+            if image_height > self.max_height:
+                html = f'<img src="{image_path}" height="{self.max_height}" style="max-width: 100%;"/>'
+            else:
+                html = f'<img src="{image_path}" />'
+
             cursor = self.textCursor()
 
             # 设置块格式为居中
@@ -58,7 +65,8 @@ class PicText(QTextEdit):
             block_format.setAlignment(Qt.AlignCenter)
             # 插入图片
             cursor.insertBlock(block_format)  # 插入一个新块并应用居中格式
-            cursor.insertImage(image, image_path)
+            # cursor.insertImage(image, image_path)
+            cursor.insertHtml(html)
 
             # 移动光标到插入块的后面
             cursor.insertBlock()  # 插入一个新块以结束当前块
@@ -68,8 +76,12 @@ class PicText(QTextEdit):
             cursor.setBlockFormat(block_format)
             # 更新文本编辑器的光标
             self.setTextCursor(cursor)
+                
         else:
             print(f"Failed to load image {image_path}")
+
+    def set_content(self, content):
+        self.setHtml(content)
 
 
 class MainWindow(QMainWindow):
@@ -137,15 +149,9 @@ class MainWindow(QMainWindow):
                 # 更新文本编辑器的光标
                 self.text_edit.setTextCursor(cursor)
 
-    def get_text(self):
-        return self.text_edit.toHtml()
-
-    def set_text(self, text):
-        self.text_edit.setHtml(text)
-
     def test(self):
         html = self.text_edit.toHtml()
-        html = html.replace("F:/Project/Python/Project/README_Gen/" + '/', '')
+        html = html.replace("F:/Project/Python/Project/README_Gen/", '')
         html = html.splitlines()  # 将字符串按行分割成列表
         html = '\n'.join(html[4:])  # 跳过前四行
         print('-----------------------------------------------------------------')
