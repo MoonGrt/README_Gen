@@ -1,4 +1,4 @@
-**简体中文 | [English](README.md)**<br>
+**简体中文 | [English](README.md)**
 <div id="top"></div>
 
 [![Contributors][contributors-shield]][contributors-url]
@@ -16,7 +16,7 @@
     </a>
 <h3 align="center">README_Gen</h3>
     <p align="center">
-    了解 README_Gen，它是轻松制作精美 GitHub README.md 文件的终极解决方案。轻松定制项目文档，包括可定制的细节、徽章和布局。一键生成并直接集成 GitHub，加快工作流程。轻松创建专业的项目页面，提升你在 GitHub 上的影响力。
+    README_Gen 是轻松制作精美 GitHub README.md 文件的终极解决方案。轻松定制项目文档，包括细节、徽章和布局。一键生成并直接集成 GitHub，加快工作流程，轻松创建专业的项目页面。
     <br />
     <a href="https://github.com/MoonGrt/README_Gen"><strong>Explore the docs »</strong></a>
     <br />

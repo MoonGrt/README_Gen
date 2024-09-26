@@ -1,4 +1,4 @@
-**English | [简体中文](README_cn.md)**<br>
+**English | [简体中文](README_cn.md)**
 <div id="top"></div>
 
 [![Contributors][contributors-shield]][contributors-url]
@@ -16,7 +16,7 @@
     </a>
 <h3 align="center">README_Gen</h3>
     <p align="center">
-    Discover README_Gen, the ultimate solution for crafting polished GitHub README.md files effortlessly. Tailor your project documentation with ease, including customizable details, badges, and layouts. Accelerate your workflow with one-click generation and direct GitHub integration. Boost your GitHub presence by effortlessly creating professional project pages.
+    README_Gen, the ultimate solution for crafting polished GitHub README.md files effortlessly. Tailor your project documentation with ease, including customizable details, badges, and layouts.
     <br />
     <a href="https://github.com/MoonGrt/README_Gen"><strong>Explore the docs »</strong></a>
     <br />
@@ -60,20 +60,19 @@
 └─ Project
   ├─ ContentTree.py
   ├─ FileTree.py
-  ├─ Git.py
-  ├─ LICENSE
   ├─ Markdown.py
+  ├─ markdown_to_html.py
   ├─ PicText.py
-  ├─ README.md
-  ├─ README_cn.md
   ├─ README_Gen.py
   ├─ README_Gen_cn.py
   ├─ README_temple.py
-  ├─ requirements.txt
   ├─ run.bat
-  └─ /images/
-    └─ logo.png
-
+  ├─ run_cn.bat
+  ├─ /images/
+  │ └─ logo.png
+  └─ /temple/
+    ├─ temple_blank_cn.md
+    └─ temple_blank_en.md
 ```
 
 
@@ -81,9 +80,17 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Discover README_generator, the ultimate solution for crafting polished GitHub README.md files effortlessly. Tailor your project documentation with ease, including customizable details, badges, and layouts. Accelerate your workflow with one-click generation and direct GitHub integration. Boost your GitHub presence by effortlessly creating professional project pages.</p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">README_Gen is a PyQt-based GUI tool designed to help users easily and quickly generate README files for GitHub projects. Based on a well-crafted template, users can customize their README by selecting sections such as &quot;Table of Contents,&quot; &quot;File Tree,&quot; &quot;About the Project,&quot; &quot;Usage,&quot; &quot;Version,&quot; &quot;Contributing,&quot; &quot;License,&quot; &quot;Contact Us,&quot; and &quot;Acknowledgments.&quot;</p>
 <p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/README_Gen.png" height="400" /></p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/README_Gen_cn.png" height="400" /></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Users can select what they want to include in the project README in the “Table of Contents” section. The software will update the right side of the editing screen in real time according to the user's choices.</p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/Content.png" /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When the user enters the path to the project, the software will scan the project and display the user's project file tree (files, levels, etc.) in the “File Tree” section. The user can select the core files of the project in the “File Tree” section, and the software will automatically add the user's selection to the corresponding file tree display module of the README.</p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/Filetree.png" /><img src="images/Filetree_demo.png" /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">In addition, the software also integrates features such as generating (MIT) LICENSE, sending Github, README simple preview, and so on. In case of python projects, the software can also generate 'requirement.</p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/LICENSE.png" /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">s.txt', 'run.bat' for the user.</p></body></html>
 <p align="right">(<a href="#top">top</a>)</p>
 
 

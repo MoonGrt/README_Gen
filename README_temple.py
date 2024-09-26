@@ -273,10 +273,10 @@ class README_temple():
 
 
     def gen_chineselink(self):
-        return """**English | [简体中文](README_cn.md)**<br>"""
+        return """**English | [简体中文](README_cn.md)**"""
 
     def gen_englishlink(self):
-        return """**简体中文 | [English](README.md)**<br>"""
+        return """**简体中文 | [English](README.md)**"""
 
     def gen_topid(self):
         return """<div id="top"></div>"""
