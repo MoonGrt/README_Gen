@@ -23,7 +23,6 @@
     <br />
     <a href="https://github.com/othneildrew/Best-README-Template"><strong>浏览文档 »</strong></a>
     <br />
-    <br />
     <a href="https://github.com/othneildrew/Best-README-Template">查看 Demo</a>
     ·
     <a href="https://github.com/othneildrew/Best-README-Template/issues">反馈 Bug</a>

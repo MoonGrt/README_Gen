@@ -164,6 +164,7 @@ class App_window(QMainWindow):
         self.username_input.textChanged.connect(self.handle_username_change)
         self.repo_input.currentIndexChanged.connect(self.handle_repo_change)
         self.mail_input.textChanged.connect(self.handle_mail_change)
+        self.title_input.textChanged.connect(self.handle_title_change)
         self.MIT_name_input.textChanged.connect(self.handle_MIT_name_change)
         self.MIT_date_input.textChanged.connect(self.handle_MIT_name_change)
 
@@ -297,6 +298,15 @@ class App_window(QMainWindow):
     def handle_repo_change(self, new_text):
         self.title_input.setText(self.repo_input.currentText())
 
+    # 处理 title 变化
+    def handle_title_change(self, new_text):
+        index = self.repo_input.findText(new_text)
+        if index == -1:
+            self.repo_input.setCurrentIndex(-1)
+            self.title_input.setText(new_text)
+        else:
+            self.repo_input.setCurrentIndex(index)
+
     # 处理 mail 变化
     def handle_mail_change(self, new_text):
         self.contact_input.setPlainText(self.README_temple.gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
@@ -336,11 +346,15 @@ class App_window(QMainWindow):
                     child_item.setCheckState(0, 0)  # 如果母选项未选中，则禁用子选项的选择功能
                     child_item.setDisabled(True)
             elif item.checkState(0) == 2:
-                if item.childCount() < 10:
+                if item.childCount() < 20:
                     for i in range(item.childCount()):
                         child_item = item.child(i)
                         child_item.setDisabled(False)
                         child_item.setCheckState(0, 2)  # 如果母选项选中，则开启子选项的选择功能
+                else:
+                    for i in range(item.childCount()):
+                        child_item = item.child(i)
+                        child_item.setDisabled(False)
         # 根据用户的选择改变 filetree_input
         self.filetree_input.setPlainText(self.file_tree.get_filetree())
 
@@ -390,7 +404,7 @@ class App_window(QMainWindow):
             self.description_input.setPlainText(self.README_temple.description)
 
             self.filetree_input.setPlainText(self.README_temple.filetree)
-            self.about_input.setHtml(self.README_temple.about)
+            self.about_input.setHtml(self.add_path(self.README_temple.about))
             self.buildwith_input.setPlainText(self.README_temple.build)
             self.start_input.setPlainText(self.README_temple.start)
             self.prerequisites_input.setPlainText(self.README_temple.prerequisites)
@@ -403,6 +417,9 @@ class App_window(QMainWindow):
             self.MIT_input.setPlainText(self.README_temple.gen_MIT())
             self.contact_input.setPlainText(self.README_temple.contact)
             self.acknowledgements_input.setPlainText(self.README_temple.acknowledgments)
+
+    def add_path(self, text):
+        return text.replace('<img src="', f'<img src="{self.project_path}/')
 
     def insert_file(self):
         image_path, _ = QFileDialog.getOpenFileName(self, '打开文件', '', '图片 (*.jpg *.png *.bmp)')
@@ -704,7 +721,7 @@ class App_window(QMainWindow):
 
     def get_about(self):
         about_html = self.about_input.toHtml()
-        about_html = about_html.replace(self.project_path + '/', '')
+        about_html = about_html.replace(self.project_path + '/', '')  # 删除图片的路径
         about_html = about_html.splitlines()  # 将字符串按行分割成列表
         about_html = '\n'.join(about_html[4:])  # 跳过前四行
         return about_html
@@ -743,7 +760,5 @@ if __name__ == '__main__':
     sys.exit(app.exec_())
 
 
-# TODO: 添加对git异常的处理：fatal: detected dubious ownership in repository at 'U:/xxx'
-#       添加 ”git config --global --add safe.directory U:/xxx“
 # TODO: 添加release版本控制
-# TODO: git branch
+# TODO: 再次打开时，图片路径有问题，无法显示

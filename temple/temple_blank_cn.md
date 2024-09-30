@@ -23,7 +23,6 @@
     <br />
     <a href="https://github.com/github_username/repo_name"><strong>浏览文档 »</strong></a>
     <br />
-    <br />
     <a href="https://github.com/github_username/repo_name">查看 Demo</a>
     ·
     <a href="https://github.com/github_username/repo_name/issues">反馈 Bug</a>

@@ -306,7 +306,6 @@ class README_temple():
     <br />
     <a href="https://github.com/{username}/{repo_name}"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
     <a href="https://github.com/{username}/{repo_name}">View Demo</a>
     ·
     <a href="https://github.com/{username}/{repo_name}/issues">Report Bug</a>
@@ -360,50 +359,90 @@ class README_temple():
     # pattern 2
     # 生成 README.md 的 Contents 部分
     def gen_Contents(self, contents):
-        Contents = """<!-- CONTENTS -->\n<details open>\n  <summary>Contents</summary>\n  <ol>\n"""
-
-        # 是否开启 Filetree
-        if contents.get('File Tree'):
-            Contents += """    <li><a href="#file-tree">File Tree</a></li>\n"""
-        # 是否开启 About The Project
-        if contents.get('About The Project'):
-            Contents += """    <li>\n      <a href="#about-the-project">About The Project</a>\n      <ul>\n"""
-            if contents.get('Built With'):
-                Contents += """        <li><a href="#built-with">Built With</a></li>\n"""
-            Contents += """      </ul>\n    </li>\n"""
-        # 是否开启 Getting Started
-        if contents.get('Getting Started'):
-            Contents += """    <li>\n      <a href="#getting-started">Getting Started</a>\n      <ul>\n"""
-            if contents.get('Prerequisites'):
-                Contents += """        <li><a href="#prerequisites">Prerequisites</a></li>\n"""
-            if contents.get('Installation'):
-                Contents += """        <li><a href="#installation">Installation</a></li>\n"""
-            Contents += """      </ul>\n    </li>\n"""
-        # 是否开启 Usage
-        if contents.get('Usage'):
-            Contents += """    <li><a href="#usage">Usage</a></li>\n"""
-        # 是否开启 Roadmap
-        if contents.get('Roadmap'):
-            Contents += """    <li><a href="#roadmap">Roadmap</a></li>\n"""
-        # 是否开启 Version
-        if contents.get('Version'):
-            Contents += """    <li><a href="#version">Version</a></li>\n"""
-        # 是否开启 Contributing
-        if contents.get('Contributing'):
-            Contents += """    <li><a href="#contributing">Contributing</a></li>\n"""
-        # 是否开启 License
-        if contents.get('License'):
-            Contents += """    <li><a href="#license">License</a></li>\n"""
-        # 是否开启 Contact
-        if contents.get('Contact'):
-            Contents += """    <li><a href="#contact">Contact</a></li>\n"""
-        # 是否开启 Acknowledgments
-        if contents.get('Acknowledgments'):
-            Contents += """    <li><a href="#acknowledgments">Acknowledgments</a></li>\n"""
-        Contents += """  </ol>\n</details>\n\n"""
-
-        return Contents
-
+        if self.language == 'en':
+            Contents = """<!-- CONTENTS -->\n<details open>\n  <summary>Contents</summary>\n  <ol>\n"""
+            # 是否开启 Filetree
+            if contents.get('File Tree'):
+                Contents += """    <li><a href="#file-tree">File Tree</a></li>\n"""
+            # 是否开启 About The Project
+            if contents.get('About The Project'):
+                Contents += """    <li>\n      <a href="#about-the-project">About The Project</a>\n      <ul>\n"""
+                if contents.get('Built With'):
+                    Contents += """        <li><a href="#built-with">Built With</a></li>\n"""
+                Contents += """      </ul>\n    </li>\n"""
+            # 是否开启 Getting Started
+            if contents.get('Getting Started'):
+                Contents += """    <li>\n      <a href="#getting-started">Getting Started</a>\n      <ul>\n"""
+                if contents.get('Prerequisites'):
+                    Contents += """        <li><a href="#prerequisites">Prerequisites</a></li>\n"""
+                if contents.get('Installation'):
+                    Contents += """        <li><a href="#installation">Installation</a></li>\n"""
+                Contents += """      </ul>\n    </li>\n"""
+            # 是否开启 Usage
+            if contents.get('Usage'):
+                Contents += """    <li><a href="#usage">Usage</a></li>\n"""
+            # 是否开启 Roadmap
+            if contents.get('Roadmap'):
+                Contents += """    <li><a href="#roadmap">Roadmap</a></li>\n"""
+            # 是否开启 Version
+            if contents.get('Version'):
+                Contents += """    <li><a href="#version">Version</a></li>\n"""
+            # 是否开启 Contributing
+            if contents.get('Contributing'):
+                Contents += """    <li><a href="#contributing">Contributing</a></li>\n"""
+            # 是否开启 License
+            if contents.get('License'):
+                Contents += """    <li><a href="#license">License</a></li>\n"""
+            # 是否开启 Contact
+            if contents.get('Contact'):
+                Contents += """    <li><a href="#contact">Contact</a></li>\n"""
+            # 是否开启 Acknowledgments
+            if contents.get('Acknowledgments'):
+                Contents += """    <li><a href="#acknowledgments">Acknowledgments</a></li>\n"""
+            Contents += """  </ol>\n</details>\n\n"""
+            return Contents
+        elif self.language == 'cn':
+            Contents = """<!-- CONTENTS -->\n<details open>\n  <summary>目录</summary>\n  <ol>\n"""
+            # 是否开启 文件树
+            if contents.get('文件树'):
+                Contents += """    <li><a href="#文件树">文件树</a></li>\n"""
+            # 是否开启 关于本项目
+            if contents.get('关于本项目'):
+                Contents += """    <li>\n      <a href="#关于本项目">关于本项目</a>\n      <ul>\n"""
+                if contents.get('构建工具'):
+                    Contents += """        <li><a href="#构建工具">构建工具</a></li>\n"""
+                Contents += """      </ul>\n    </li>\n"""
+            # 是否开启 开始
+            if contents.get('开始'):
+                Contents += """    <li>\n      <a href="#开始">开始</a>\n      <ul>\n"""
+                if contents.get('依赖'):
+                    Contents += """        <li><a href="#依赖">依赖</a></li>\n"""
+                if contents.get('安装'):
+                    Contents += """        <li><a href="#安装">安装</a></li>\n"""
+                Contents += """      </ul>\n    </li>\n"""
+            # 是否开启 使用方法
+            if contents.get('使用方法'):
+                Contents += """    <li><a href="#使用方法">使用方法</a></li>\n"""
+            # 是否开启 路线图
+            if contents.get('路线图'):
+                Contents += """    <li><a href="#路线图">路线图</a></li>\n"""
+            # 是否开启 版本
+            if contents.get('版本'):
+                Contents += """    <li><a href="#版本">版本</a></li>\n"""
+            # 是否开启 贡献
+            if contents.get('贡献'):
+                Contents += """    <li><a href="#贡献">贡献</a></li>\n"""
+            # 是否开启 许可证
+            if contents.get('许可证'):
+                Contents += """    <li><a href="#许可证">许可证</a></li>\n"""
+            # 是否开启 联系我们
+            if contents.get('联系我们'):
+                Contents += """    <li><a href="#联系我们">联系我们</a></li>\n"""
+            # 是否开启 致谢
+            if contents.get('致谢'):
+                Contents += """    <li><a href="#致谢">致谢</a></li>\n"""
+            Contents += """  </ol>\n</details>\n\n"""
+            return Contents
 
     # 生成 README.md 的 Filetree 部分
     def gen_Filetree(self):

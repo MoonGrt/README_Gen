@@ -20,7 +20,6 @@
     <br />
     <a href="https://github.com/MoonGrt/README_Gen"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
     <a href="https://github.com/MoonGrt/README_Gen">View Demo</a>
     ·
     <a href="https://github.com/MoonGrt/README_Gen/issues">Report Bug</a>
@@ -34,8 +33,18 @@
 
 <!-- CONTENTS -->
 <details open>
-  <summary>Contents</summary>
+  <summary>目录</summary>
   <ol>
+    <li><a href="#文件树">文件树</a></li>
+    <li>
+      <a href="#关于本项目">关于本项目</a>
+      <ul>
+      </ul>
+    </li>
+    <li><a href="#贡献">贡献</a></li>
+    <li><a href="#许可证">许可证</a></li>
+    <li><a href="#联系我们">联系我们</a></li>
+    <li><a href="#致谢">致谢</a></li>
   </ol>
 </details>
 

@@ -20,7 +20,6 @@
     <br />
     <a href="https://github.com/MoonGrt/README_Gen"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
     <a href="https://github.com/MoonGrt/README_Gen">View Demo</a>
     ·
     <a href="https://github.com/MoonGrt/README_Gen/issues">Report Bug</a>
