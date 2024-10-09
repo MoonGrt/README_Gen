@@ -30,7 +30,7 @@ class Markdown(QWidget):
         layout.addWidget(self.text_edit)
         layout.addLayout(bottom_layout)
 
-        self.markdown_showfile('README.md')  # test
+        # self.markdown_showfile('README.md')  # test
         self.setLayout(layout)
 
 

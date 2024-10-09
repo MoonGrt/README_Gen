@@ -298,6 +298,7 @@ class App_window(QMainWindow):
     # 处理 repo 变化
     def handle_repo_change(self, new_text):
         self.title_input.setText(self.repo_input.currentText())
+        self.contact_input.setPlainText(self.README_temple.gen_Contact(self.username_input.text(), self.repo_input.currentText(), self.mail_input.text()))
 
     # 处理 title 变化
     def handle_title_change(self, new_text):
