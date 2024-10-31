@@ -188,6 +188,8 @@ class App_window(QMainWindow):
                                                ("License", [], True),
                                                ("Contact", [], True),
                                                ("Acknowledgments", [], True)], True, True)  # parent child checked expanded
+        self.content_tree.add_items(".gitignore", [], True)
+        self.content_tree.add_items("LIECENSE", [], True)
         self.content_tree.add_items("requirements.txt")
         self.content_tree.add_items("run.bat")
         self.content_tree.itemChanged.connect(self.handle_contenttree_changed)
@@ -610,12 +612,18 @@ class App_window(QMainWindow):
         self.set_gridcolwidth_ratios([1, 2])
 
     def GEN(self):
-        if self.content_tree.root.child(2).checkState(0) == 2:  # requirements.txt
+        if self.content_tree.root.child(4).checkState(0) == 2:  # requirements.txt
             # 生成 requirements.txt
             self.generate_requirements()
-        if self.content_tree.root.child(1).checkState(0) == 2:  # run.bat
+        if self.content_tree.root.child(3).checkState(0) == 2:  # run.bat
             # 生成 run.bat
             self.generate_run_bat()
+        if self.content_tree.root.child(2).checkState(0) == 2:  # LIENCE
+            # 生成 LIENCE
+            self.generate_LIENCE()
+        if self.content_tree.root.child(1).checkState(0) == 2:  # .gitignore
+            # 生成 .gitignore
+            self.generate_gitignore()
         if self.content_tree.root.child(0).checkState(0) == 2:  # README.md
             # 生成 README.md
             self.contents = self.content_tree.get_tree_content()
@@ -713,7 +721,6 @@ class App_window(QMainWindow):
             return self.contributing_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 License 部分
         if section == 'License':
-            self.generate_license()
             return self.license_input.toPlainText() + '\n' + self.README_temple.gen_toplink()
         # 生成 README.md 的 Contact 部分
         if section == 'Contact':
@@ -729,7 +736,7 @@ class App_window(QMainWindow):
         about_html = '\n'.join(about_html[4:])  # 跳过前四行
         return about_html
 
-    def generate_license(self):
+    def generate_LIENCE(self):
         if self.project_path:
             if not os.path.exists(self.project_path + '/LICENSE'):
                 # 将 License 内容保存到文件中
@@ -741,6 +748,7 @@ class App_window(QMainWindow):
             #     print("LICENSE already existed")
         else:
             print("Please select a folder")
+    # TODO: 选择许可证模板
 
     def generate_requirements(self, path='.'):
         subprocess.run(['pipreqs', path, '--force'], check=True)
