@@ -90,7 +90,7 @@ class MainWindow(QMainWindow):
 
         self.resize(800, 600)
         self.setWindowTitle('Piture Text Editor')
-        self.setWindowIcon(QIcon('images/icons/markdown.svg'))
+        self.setWindowIcon(QIcon('Document/images/icons/markdown.svg'))
 
         # 创建菜单栏
         menubar = self.menuBar()

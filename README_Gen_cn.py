@@ -28,7 +28,7 @@ class App_window(QMainWindow):
         # 设置主窗口属性
         self.resize(1000, 850)
         self.setWindowTitle('README.md 生成软件')
-        self.setWindowIcon(QIcon('images/icons/markdown.svg'))
+        self.setWindowIcon(QIcon('Document/images/icons/markdown.svg'))
 
         self.create_menu()
         self.add_sections()
@@ -200,24 +200,24 @@ class App_window(QMainWindow):
         # 文件菜单
         file_Menu = self.menuBar().addMenu('文件')
 
-        insert_Action = QAction(QIcon('images/icons/insert.svg'), '插入', self)  # 插入动作
+        insert_Action = QAction(QIcon('Document/images/icons/insert.svg'), '插入', self)  # 插入动作
         insert_Action.setToolTip('Insert')
         insert_Action.triggered.connect(self.insert_file)
         file_Menu.addAction(insert_Action)
-        open_Action = QAction(QIcon('images/icons/open.svg'), '打开', self)  # 打开动作
+        open_Action = QAction(QIcon('Document/images/icons/open.svg'), '打开', self)  # 打开动作
         open_Action.setToolTip('Open')
         open_Action.triggered.connect(self.browse_folder)
         file_Menu.addAction(open_Action)
-        close_Action = QAction(QIcon('images/icons/close.svg'), '关闭', self)  # 关闭动作
+        close_Action = QAction(QIcon('Document/images/icons/close.svg'), '关闭', self)  # 关闭动作
         close_Action.setToolTip('Close')
         close_Action.triggered.connect(self.close_folder)
         file_Menu.addAction(close_Action)
         file_Menu.addSeparator()  # 分隔线
-        save_Action = QAction(QIcon('images/icons/save.svg'), '保存', self)  # 保存动作
+        save_Action = QAction(QIcon('Document/images/icons/save.svg'), '保存', self)  # 保存动作
         save_Action.setToolTip('Save')
         save_Action.triggered.connect(self.GEN)
         file_Menu.addAction(save_Action)
-        exit_Action = QAction(QIcon('images/icons/exit.svg'), '退出', self)  # 退出动作
+        exit_Action = QAction(QIcon('Document/images/icons/exit.svg'), '退出', self)  # 退出动作
         exit_Action.setToolTip('Exit')
         exit_Action.triggered.connect(self.close)
         file_Menu.addAction(exit_Action)
@@ -225,28 +225,28 @@ class App_window(QMainWindow):
         # 编辑菜单
         edit_Menu = self.menuBar().addMenu('编辑')
 
-        undo_Action = QAction(QIcon('images/icons/undo.svg'), '撤销', self) # 撤销操作
+        undo_Action = QAction(QIcon('Document/images/icons/undo.svg'), '撤销', self) # 撤销操作
         undo_Action.setToolTip('Undo')
         # undo_Action.triggered.connect(self.undo)
         edit_Menu.addAction(undo_Action)
-        redo_Action = QAction(QIcon('images/icons/redo.svg'), '重做', self) # 重做操作
+        redo_Action = QAction(QIcon('Document/images/icons/redo.svg'), '重做', self) # 重做操作
         redo_Action.setToolTip('Redo')
         # redo_Action.triggered.connect(self.redo)
         edit_Menu.addAction(redo_Action)
         edit_Menu.addSeparator()  # 分隔线
-        cut_Action = QAction(QIcon('images/icons/cut.svg'), '剪切', self) # 剪切操作
+        cut_Action = QAction(QIcon('Document/images/icons/cut.svg'), '剪切', self) # 剪切操作
         cut_Action.setToolTip('Cut')
         # cut_Action.triggered.connect(self.cut)
         edit_Menu.addAction(cut_Action)
-        copy_Action = QAction(QIcon('images/icons/copy.svg'), '复制', self) # 复制操作
+        copy_Action = QAction(QIcon('Document/images/icons/copy.svg'), '复制', self) # 复制操作
         copy_Action.setToolTip('Copy')
         # copy_Action.triggered.connect(self.copy)
         edit_Menu.addAction(copy_Action)
-        paste_Action = QAction(QIcon('images/icons/paste.svg'), '粘贴', self) # 粘贴操作
+        paste_Action = QAction(QIcon('Document/images/icons/paste.svg'), '粘贴', self) # 粘贴操作
         paste_Action.setToolTip('Paste')
         # paste_Action.triggered.connect(self.paste)
         edit_Menu.addAction(paste_Action)
-        mode_Action = QAction(QIcon('images/icons/mode.svg'), '模式', self) # 模式操作
+        mode_Action = QAction(QIcon('Document/images/icons/mode.svg'), '模式', self) # 模式操作
         mode_Action.setToolTip('Mode')
         mode_Action.triggered.connect(self.mode)
         edit_Menu.addAction(mode_Action)
@@ -644,10 +644,10 @@ class App_window(QMainWindow):
         self.Markdown.close()
 
     def copy_images(self):
-        destination_folder = os.path.join(self.project_path, 'images')  # 目标文件夹的 images 目录
+        destination_folder = os.path.join(self.project_path, 'Document/images')  # 目标文件夹的 images 目录
         destination_path = os.path.join(destination_folder, 'logo.png')  # 定义目标文件路径
         if not os.path.exists(destination_path):
-            source_path = os.path.join(os.getcwd(), 'images', 'logo.png')  # 当前文件夹下 images/logo.png
+            source_path = os.path.join(os.getcwd(), 'Document/images', 'logo.png')  # 当前文件夹下 Document/images/logo.png
             # 确保目标文件夹存在，如果不存在则创建
             os.makedirs(destination_folder, exist_ok=True)
             try:
@@ -759,8 +759,17 @@ class App_window(QMainWindow):
             file.write(batch_content)
 
     def generate_gitignore(self):
-        with open('.gitignore', 'w') as file:
-            pass
+        if self.project_path:
+            if not os.path.exists(self.project_path + '/.gitignore'):
+                # 将 License 内容保存到文件中
+                license_path = self.project_path + '/.gitignore'
+                with open(license_path, 'w', encoding='utf-8') as license_file:
+                    pass
+                print(f".gitignore generated successfully at {license_path}")
+            # else:
+            #     print(".gitignore already existed")
+        else:
+            print("Please select a folder")
     # TODO: 用户界面选择哪些文件忽略
 
 

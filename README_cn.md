@@ -12,19 +12,19 @@
 <br />
 <div align="center">
     <a href="https://github.com/MoonGrt/README_Gen">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="Document/images/logo.png" alt="Logo" width="80" height="80">
     </a>
 <h3 align="center">README_Gen</h3>
     <p align="center">
     README_Gen 是轻松制作精美 GitHub README.md 文件的终极解决方案。轻松定制项目文档，包括可定制的细节、徽章和布局。
     <br />
-    <a href="https://github.com/MoonGrt/README_Gen"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/MoonGrt/README_Gen"><strong>浏览文档 »</strong></a>
     <br />
-    <a href="https://github.com/MoonGrt/README_Gen">View Demo</a>
+    <a href="https://github.com/MoonGrt/README_Gen">查看 Demo</a>
     ·
-    <a href="https://github.com/MoonGrt/README_Gen/issues">Report Bug</a>
+    <a href="https://github.com/MoonGrt/README_Gen/issues">反馈 Bug</a>
     ·
-    <a href="https://github.com/MoonGrt/README_Gen/issues">Request Feature</a>
+    <a href="https://github.com/MoonGrt/README_Gen/issues">请求新功能</a>
     </p>
 </div>
 
@@ -67,7 +67,7 @@
   ├─ README_temple.py
   ├─ run.bat
   ├─ run_cn.bat
-  ├─ /images/
+  ├─ /Document/images/
   │ └─ logo.png
   └─ /temple/
     ├─ temple_blank_cn.md
@@ -80,13 +80,13 @@
 ## 关于本项目
 
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">README_Gen 是一个基于 PyQt 开发的 GUI 工具，旨在帮助用户轻松快速地生成 GitHub 项目的 README 文档。用户可以根据精心设计的模板，自由选择要包含的内容，包括 “目录”、“文件树”、“关于本项目”、“使用方法”、“版本”、“贡献”、“许可证”、“联系我们”、“致谢”等。</p>
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/README_Gen.png" height="400" /><img src="images/README_Gen_cn.png" height="400" /></p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="Document/images/README_Gen.png" height="400" /><img src="Document/images/README_Gen_cn.png" height="400" /></p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">用户可以在“目录”板块选择想要在项目README包括的内容。软件会根据用户的选择实时更新右侧编辑界面。</p>
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/Content.png" height="300" /></p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="Document/images/Content.png" height="300" /></p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">当用户输入了项目路径后，软件将扫描该项目并在“文件树”板块显示用户项目文件树（文件、层级等）。用户可以在“文件树”板块选择项目的核心文件，软件将自动将用户的选择添加到README对应的文件树展示模块。</p>
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/Filetree.png" height="280" /> <img src="images/Filetree_demo.png" /></p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="Document/images/Filetree.png" height="280" /> <img src="Document/images/Filetree_demo.png" /></p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">此外，该软件还集成了生成（MIT）LICENSE、发送Github、README简单预览等功能，如果是python工程，软件还能为用户生成‘requirements.txt’、‘run.bat’。</p>
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/LICENSE.png" /></p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="Document/images/LICENSE.png" /></p>
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>
 <p align="right">(<a href="#top">top</a>)</p>
 

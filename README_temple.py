@@ -44,9 +44,9 @@ class README_temple():
                 
 
         if self.language == 'en':
-            temple = 'temple/temple_blank_en.md'
+            temple = 'Temple/temple_blank_en.md'
         elif self.language == 'cn':
-            temple = 'temple/temple_blank_cn.md'
+            temple = 'Temple/temple_blank_cn.md'
         with open(temple, 'r', encoding='utf-8') as file:
             self.temple_content = file.read()
 
@@ -286,7 +286,8 @@ class README_temple():
 
     # 生成 README.md 的 Head 部分
     def gen_Head(self, username, repo_name, title, description):
-        return f"""
+        if self.language == 'en':
+            Contents = f"""
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -298,7 +299,7 @@ class README_temple():
 <br />
 <div align="center">
     <a href="https://github.com/{username}/{repo_name}">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="Document/images/logo.png" alt="Logo" width="80" height="80">
     </a>
 <h3 align="center">{title}</h3>
     <p align="center">
@@ -314,6 +315,37 @@ class README_temple():
     </p>
 </div>
 """
+            return Contents
+        elif self.language == 'cn':
+            Contents = f"""
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![License][license-shield]][license-url]
+
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+    <a href="https://github.com/{username}/{repo_name}">
+    <img src="Document/images/logo.png" alt="Logo" width="80" height="80">
+    </a>
+<h3 align="center">{title}</h3>
+    <p align="center">
+    {description}
+    <br />
+    <a href="https://github.com/{username}/{repo_name}"><strong>浏览文档 »</strong></a>
+    <br />
+    <a href="https://github.com/{username}/{repo_name}">查看 Demo</a>
+    ·
+    <a href="https://github.com/{username}/{repo_name}/issues">反馈 Bug</a>
+    ·
+    <a href="https://github.com/{username}/{repo_name}/issues">请求新功能</a>
+    </p>
+</div>
+"""
+            return Contents
 
     # # pattern 1
     # # 生成 README.md 的 Contents 部分
@@ -553,7 +585,7 @@ Project Link: [{username}/{repo_name}](https://github.com/{username}/{repo_name}
 if __name__ == '__main__':
     # README_content = README_temple()
     README_content = README_temple('cn')
-    # README_content.extract_contents('temple/temple_blank_en.md')
+    # README_content.extract_contents('Temple/temple_blank_en.md')
     # README_content.extract_contents('README.md')
     README_content.extract_contents('README_cn.md')
 

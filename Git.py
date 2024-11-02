@@ -16,7 +16,7 @@ class App_window(QWidget):
         # 设置主窗口属性
         self.resize(600, 500)
         self.setWindowTitle('Git')
-        self.setWindowIcon(QIcon('images/icons/markdown.svg'))
+        self.setWindowIcon(QIcon('Document/images/icons/markdown.svg'))
 
         # 基本信息
         self.username_label = QLabel('GitHub Username:')

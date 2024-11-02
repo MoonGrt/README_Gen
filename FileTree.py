@@ -217,7 +217,7 @@ if __name__ == '__main__':
   ├─ requirements.txt
   ├─ run.bat
   ├─ /icons/
-  └─ /images/
+  └─ /Document/images/
 """
 
     # 设置文件树

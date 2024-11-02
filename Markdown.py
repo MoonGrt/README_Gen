@@ -13,7 +13,7 @@ class Markdown(QWidget):
         # 设置主窗口属性
         self.resize(1100, 800)
         self.setWindowTitle('Markdown Display')
-        self.setWindowIcon(QIcon('images/icons/markdown.svg'))
+        self.setWindowIcon(QIcon('Document/images/icons/markdown.svg'))
 
         self.text_edit = QTextEdit()
 

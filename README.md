@@ -12,7 +12,7 @@
 <br />
 <div align="center">
     <a href="https://github.com/MoonGrt/README_Gen">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="Document/images/logo.png" alt="Logo" width="80" height="80">
     </a>
 <h3 align="center">README_Gen</h3>
     <p align="center">
@@ -67,7 +67,7 @@
   ├─ README_temple.py
   ├─ run.bat
   ├─ run_cn.bat
-  ├─ /images/
+  ├─ /Document/images/
   │ └─ logo.png
   └─ /temple/
     ├─ temple_blank_cn.md
@@ -80,13 +80,13 @@
 ## About The Project
 
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">README_Gen is a PyQt-based GUI tool designed to help users easily and quickly generate README files for GitHub projects. Based on a well-crafted template, users can customize their README by selecting sections such as &quot;Table of Contents,&quot; &quot;File Tree,&quot; &quot;About the Project,&quot; &quot;Usage,&quot; &quot;Version,&quot; &quot;Contributing,&quot; &quot;License,&quot; &quot;Contact Us,&quot; and &quot;Acknowledgments.&quot;</p>
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/README_Gen.png" height="400" /><img src="images/README_Gen_cn.png" height="400" /></p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="Document/images/README_Gen.png" height="400" /><img src="Document/images/README_Gen_cn.png" height="400" /></p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Users can select what they want to include in the project README in the “Table of Contents” section. The software will update the right side of the editing screen in real time according to the user's choices.</p>
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/Content.png" height="300" /></p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="Document/images/Content.png" height="300" /></p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When the user enters the path to the project, the software will scan the project and display the user's project file tree (files, levels, etc.) in the “File Tree” section. The user can select the core files of the project in the “File Tree” section, and the software will automatically add the user's selection to the corresponding file tree display module of the README.</p>
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/Filetree.png" height="280" /> <img src="images/Filetree_demo.png" /></p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="Document/images/Filetree.png" height="280" /> <img src="Document/images/Filetree_demo.png" /></p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">In addition, the software also integrates features such as generating (MIT) LICENSE, sending Github, README simple preview, and so on. In case of python projects, the software can also generate 'requirement.s.txt', 'run.bat' for the user.</p>
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="images/LICENSE.png" /></p>
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src="Document/images/LICENSE.png" /></p>
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>
 <p align="right">(<a href="#top">top</a>)</p>
 
@@ -120,7 +120,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 MoonGrt - 1561145394@qq.com
 Project Link: [MoonGrt/README_Gen](https://github.com/MoonGrt/README_Gen)
-
 <p align="right">(<a href="#top">top</a>)</p>
 
 
