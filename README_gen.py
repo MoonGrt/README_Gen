@@ -788,3 +788,5 @@ if __name__ == '__main__':
 # TODO: 添加release版本控制
 # TODO: 再次打开时，图片路径有问题，无法显示
 # TODO: CODE_OF_CONDUCT
+# TODO: 选择许可证模板
+# TODO: 文件树右键选择文件夹下全部文件，左键仅选择文件夹

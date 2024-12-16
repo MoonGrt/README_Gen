@@ -76,7 +76,7 @@
 
 这是一个用于快速开始的空白模板：为了避免重复输入太多信息，请使用你的文本编辑器查找替换下面的内容：`github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `项目标题`, `项目简介`
 
-<p align="right">(<a href="#top">回到顶部</a>)</p>
+<p align="right">(<a href="#top">顶部</a>)</p>
 
 
 
@@ -91,7 +91,7 @@
 * [Bootstrap](https://getbootstrap.com)
 * [JQuery](https://jquery.com)
 
-<p align="right">(<a href="#top">回到顶部</a>)</p>
+<p align="right">(<a href="#top">顶部</a>)</p>
 
 
 
@@ -152,7 +152,7 @@ _转到 [文档](https://example.com) 查看更多示例_
 
 到 [open issues](https://github.com/github_username/repo_name/issues) 页查看所有请求的功能 （以及已知的问题）。
 
-<p align="right">(<a href="#top">回到顶部</a>)</p>
+<p align="right">(<a href="#top">顶部</a>)</p>
 
 
 
@@ -178,7 +178,7 @@ _转到 [文档](https://example.com) 查看更多示例_
 4. 推送到该分支 (`git push origin feature/AmazingFeature`)
 5. 创建一个拉取请求（Pull Request）
 
-<p align="right">(<a href="#top">回到顶部</a>)</p>
+<p align="right">(<a href="#top">顶部</a>)</p>
 
 
 
@@ -187,7 +187,7 @@ _转到 [文档](https://example.com) 查看更多示例_
 
 根据 MIT 许可证分发。打开 [LICENSE](LICENSE) 查看更多内容。
 
-<p align="right">(<a href="#top">回到顶部</a>)</p>
+<p align="right">(<a href="#top">顶部</a>)</p>
 
 
 
@@ -198,14 +198,12 @@ _转到 [文档](https://example.com) 查看更多示例_
 
 项目链接: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
 
-<p align="right">(<a href="#top">回到顶部</a>)</p>
+<p align="right">(<a href="#top">顶部</a>)</p>
 
 
 
 <!-- 致谢 -->
 ## 致谢
-
-在这里列出你觉得有用的资源，并以此致谢。我已经添加了一些我喜欢的资源，以便你可以快速开始！
 
 * [Choose an Open Source License](https://choosealicense.com)
 * [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
@@ -216,7 +214,7 @@ _转到 [文档](https://example.com) 查看更多示例_
 * [Font Awesome](https://fontawesome.com)
 * [React Icons](https://react-icons.github.io/react-icons/search)
 
-<p align="right">(<a href="#top">回到顶部</a>)</p>
+<p align="right">(<a href="#top">顶部</a>)</p>
 
 
 

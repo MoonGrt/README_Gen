@@ -127,9 +127,6 @@ Project Link: [MoonGrt/README_Gen](https://github.com/MoonGrt/README_Gen)
 
 <!-- 致谢 -->
 ## 致谢
-
-在这里列出你觉得有用的资源，并以此致谢。我已经添加了一些我喜欢的资源，以便你可以快速开始！
-
 * [Choose an Open Source License](https://choosealicense.com)
 * [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
 * [Malven's Flexbox Cheatsheet](https://flexbox.malven.co/)
